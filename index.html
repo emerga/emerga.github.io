@@ -20,7 +20,7 @@
 <script src="dist/samples.js"></script>
 <script type="text/javascript">
   var urlParams = new URLSearchParams(window.location.search);
-  var script = 'sample';
+  var script = 'Sample';
   if (urlParams) {
     const params = urlParams.toString().split('&');
     params.forEach((param) => {
@@ -30,7 +30,6 @@
       }
     });  
   }
-  alert(script);
   emerga.run(samples[script]);
 </script>
 </body>
