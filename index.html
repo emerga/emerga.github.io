@@ -8,7 +8,7 @@
 </head>
 <style>
     body {
-        background-color: white;
+        background-color: #f3eee8;
         text-align: center;
         width: 100%;
         height: 100%;
@@ -16,17 +16,19 @@
         margin: 0;
     }
     canvas {
-        background-color: white;
-        width: 50%;
+        background-color: #f3eee8;
+        width: 60%;
         overflow: hidden;
         margin: 0;
-        border: 1px solid #d3d3d3;
+        border: 3px solid #FF00FF;
     }
 </style>
 
 <body>
+    <script src="lib/fabric.js"></script>
     <script src="lib/emerga.js"></script>
     <script src="lib/samples.js"></script>
+    
     <script type="text/javascript">
         var urlParams = new URLSearchParams(window.location.search);
         var script = 'Sample';
@@ -43,7 +45,7 @@
             Emerga.run(Samples[script]);
         });
     </script>
-    <canvas id="main" width="6400" height="6400" />
+    <canvas id="main" width="1200" height="1200" />
 </body>
 
 </html>
