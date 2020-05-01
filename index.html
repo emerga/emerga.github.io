@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <title>Emerga</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" href="./index.css">
 </head>
 <style>
     body {
@@ -20,7 +21,7 @@
         width: 60%;
         overflow: hidden;
         margin: 0;
-        border: 3px solid #FF00FF;
+        border: 3px solid #333;
     }
     #header {
         width: 100%;
@@ -28,6 +29,9 @@
     }
 </style>
 <head>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script type="text/javascript" src="http://w2ui.com/src/w2ui-1.5.rc1.min.js"></script>
+
     <script src="lib/fabric.js"></script>
     <script src="lib/emerga.js"></script>
     <script src="lib/emergasamples.js"></script>
@@ -49,8 +53,7 @@
         });
     </script>
 </head>
-<body>
-    <div id="header"></div>
+<body id="body">
     <canvas id="main" width="1200" height="1200" />
 </body>
 
