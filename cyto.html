@@ -1,0 +1,76 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Emerga</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+</head>
+<style>
+    body {
+        text-align: center;
+        width: 100%;
+        overflow: hidden;
+        margin: 0;
+        padding-top: 40px;
+    }
+    .block {
+        display: block;
+    }
+    .cyto {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+        padding: 10px;
+        display: block;
+    }
+</style>
+<head>
+    <script src="lib/jquery.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <script src="lib/w2ui.js"></script>
+    <script src="lib/fabric.js"></script>
+    <script src="lib/emerga.js"></script>
+    <script src="lib/emergasamples.js"></script>
+    
+    <script type="text/javascript">
+        var urlParams = new URLSearchParams(window.location.search);
+        var script = 'Sample';
+        if (urlParams) {
+            const params = urlParams.toString().split('&');
+            params.forEach((param) => {
+                const p = param.split('=');
+                if (p[0] && (p[0] === 'script' || p[0] === 's')) {
+                    script = p[1];
+                }
+            });
+        }
+        document.addEventListener("DOMContentLoaded", function(){
+            Emerga.run(EmergaSamples[script]);
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-9" id="main">
+                <div class="row">
+                    <div class="col-sm-12" id="toolbar"/>
+                    <div class="col-sm-12" id="cy">
+                    <div class="col-sm-12" id="io">
+                      <div class="row">
+                          <div class="col-sm-12" id="input"/>
+                          <div class="col-sm-12" id="output">
+                          </div>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+            </div>
+            <div class="col-sm-3" id="sidebar"> </div>
+        </div>
+      </div>
+</body>
+</html>
