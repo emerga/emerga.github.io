@@ -5,12 +5,11 @@
     <meta charset="utf-8">
     <title>Emerga</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <link rel="stylesheet" href="./css/w2ui.css">
 </head>
 <style>
     body {
         width: 100%;
-        height: 100%;
+        min-height: 800px;
         background-color: #333;
     }
     canvas {
@@ -26,17 +25,117 @@
         border: 3px solid #111;
         padding: 4px;
     }
+    #cy {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        left: 0;
+        top: 0;
+        z-index: 999;
+      }
+
+
+
+      p{ 
+        text-align: center; 
+        overflow: overlay;
+        position: relative;
+   }
+   
+   body{
+       -webkit-touch-callout: none;
+       -webkit-user-select: none;
+       -khtml-user-select: none;
+       -moz-user-select: none;
+       -ms-user-select: none;
+       user-select: none;
+       background-color: rgb(248, 248, 248)
+   }
+   
+   #toolbox{
+       position: absolute;
+       bottom: 0;
+       left: 0;
+       margin-bottom: 0.5em;
+       margin-left: 1em;
+       border: 2px solid #EEEEEE;
+       border-radius: 5px;
+       padding: 1em;
+       z-index: 5;
+   }
+   
+   #toolbox input{
+       width: 30px;
+       opacity: 0.4;
+   }
+   #toolbox input:hover{
+       opacity: 1;
+       cursor: pointer;
+   }
+   
+   #hidden-file-upload{
+       display: none;
+   }
+   
+   #download-input{
+       margin: 0 0.5em;
+   }
+   
+   .conceptG text{
+       pointer-events: none;
+   }
+   
+   marker{
+       fill: #333;
+   }
+   
+   g.conceptG circle{
+       fill: #F6FBFF;
+       stroke: #333;
+       stroke-width: 2px;
+   }
+   
+   g.conceptG:hover circle{
+       fill: rgb(200, 238, 241);
+   }
+   
+   g.selected circle{
+       fill: rgb(250, 232, 255);
+   }
+   g.selected:hover circle{
+       fill: rgb(250, 232, 255);
+   }
+   
+   path.link {
+       fill: none;
+       stroke: #333;
+       stroke-width: 6px;
+       cursor: default;
+   }
+   
+   path.link:hover{
+       stroke: rgb(94, 196, 204);
+   }
+   
+   g.connect-node circle{
+       fill: #BEFFFF;
+   }
+   
+   path.link.hidden{
+       stroke-width: 0;
+   }
+   
+   path.link.selected {
+       stroke: rgb(229, 172, 247);
+   }
 </style>
-<head>
-    <script src="lib/jquery.js"></script>
-    <script src="lib/w2ui.js"></script>
-    <script src="lib/fabric.js"></script>
-    <script src="lib/emerga.js"></script>
-    <script src="lib/emergasamples.js"></script>
+<head>   
+    <script src="//d3js.org/d3.v3.js" charset="utf-8"></script>    
+    <script src="//cdn.jsdelivr.net/filesaver.js/0.1/FileSaver.min.js"></script>
     
     <script type="text/javascript">
         var urlParams = new URLSearchParams(window.location.search);
-        var script = 'Sample';
+        var script = 'FractalOfLife';
         if (urlParams) {
             const params = urlParams.toString().split('&');
             params.forEach((param) => {
@@ -47,9 +146,9 @@
             });
         }
         document.addEventListener("DOMContentLoaded", function(){
-            Emerga.run(EmergaSamples[script]);
+            Emerga.Emerga.run(Emerga.EmergaSamples[script]);
         });
     </script>
 </head>
-<body id="body"></body>
+<body id="body"><script src="emerga.js"></script><script src="jquery.js"></script><script src="threejs.js"></script><script src="math.js"></script><script src="taucharts.js"></script><script src="datgui.js"></script><script src="datcolor.js"></script><script src="stats.js"></script><script src="micromodal.js"></script></body>
 </html>
