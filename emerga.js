@@ -51121,7 +51121,39 @@ var _showGraph = function _showGraph(updated) {
       nodes: graphnodes,
       edges: graphedges
     }
-  }); // cy.cxtmenu({
+  });
+
+  var flash = function flash(els) {
+    var ms = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 100;
+    var cb = arguments.length > 2 ? arguments[2] : undefined;
+    var anims = els.map(function (el) {
+      return el.animation({
+        style: {
+          'background-color': 'cyan',
+          'line-color': 'cyan',
+          'target-arrow-color': 'cyan',
+          'width': 3
+        },
+        duration: ms
+      });
+    });
+    anims.forEach(function (el) {
+      return el.play() // start
+      .promise('completed').then(function () {
+        el.reverse().rewind().play().promise('completed').then(cb);
+      });
+    });
+  };
+
+  window.flash = flash;
+
+  var flashFade = function flashFade(els) {
+    flash(els, 100, function () {
+      return flash(els, 500);
+    });
+  };
+
+  flashFade.flash = flashFade; // cy.cxtmenu({
   //     selector: 'node, edge',
   //     commands: [{
   //         content: '<span class="fa fa-flash fa-2x"></span>',
@@ -51157,84 +51189,11 @@ var _showGraph = function _showGraph(updated) {
   // });
 
   cy.on("click", "node", function (event) {
-    var me = event.target,
-        hood = me.neighborhood(),
-        c = me.style('background-color');
-    hood.forEach(function (el) {
-      return el.data('color', el.style('background-color'));
-    }); //
-
-    me.animation({
-      style: {
-        'background-color': 'cyan'
-      },
-      duration: 100
-    }).play() // start
-    .promise('completed').then(function () {
-      // on next completed
-      me.animation({
-        style: {
-          'background-color': c
-        },
-        duration: 100
-      }).play();
-      hood.forEach(function (el) {
-        el.animation({
-          style: {
-            'background-color': el.data('color')
-          },
-          duration: 100
-        }).play();
-      });
-    }); //
-
-    hood.forEach(function (el) {
-      el.animation({
-        style: {
-          'background-color': 'cyan'
-        },
-        duration: 100
-      }).play();
-    });
+    var cid = event.target.data('id');
+    flashFade(cy.elements('node#' + cid + ',edge[source="' + cid + '"]'));
   });
   cy.on("click", "edge", function (event) {
-    var me = event.target,
-        hood = me.nodes(),
-        c = me.style('line-color');
-    hood.forEach(function (el) {
-      return el.data('color', el.style('line-color'));
-    });
-    me.animation({
-      style: {
-        'line-color': 'cyan'
-      },
-      duration: 100
-    }).play() // start
-    .promise('completed').then(function () {
-      // on next completed
-      me.animation({
-        style: {
-          'line-color': c
-        },
-        duration: 100
-      }).play();
-      hood.forEach(function (el) {
-        el.animation({
-          style: {
-            'line-color': el.data('color')
-          },
-          duration: 100
-        }).play();
-      });
-    });
-    hood.forEach(function (el) {
-      el.animation({
-        style: {
-          'line-color': 'cyan'
-        },
-        duration: 100
-      }).play();
-    });
+    flashFade(event.target);
   });
 };
 /**
