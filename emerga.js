@@ -20856,7 +20856,7 @@ module.exports = exports;
 var ___CSS_LOADER_API_IMPORT___ = __webpack_require__(/*! ../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
 exports = ___CSS_LOADER_API_IMPORT___(false);
 // Module
-exports.push([module.i, "body {\n    background-color: #fff;\n}\n\n#toolbox {\n    position: absolute;\n    top: 1;\n    left: 0;\n    margin-bottom: 0.5em;\n    margin-left: 1em;\n    border: 2px solid #EEEEEE;\n    border-radius: 5px;\n    padding: 1em;\n    z-index: 5;\n}\n\n#toolbox input {\n    width: 30px;\n    opacity: 0.4;\n}\n\n#toolbox input:hover {\n    opacity: 1;\n    cursor: pointer;\n}\n\n#hidden-file-upload {\n    display: none;\n}\n\n#download-input {\n    margin: 0 1em;\n}", ""]);
+exports.push([module.i, "body {\n    background-color: #fff;\n}\n\n#toolbox {\n    position: absolute;\n    top: 1;\n    left: 0;\n    margin-bottom: 0.5em;\n    margin-left: 1em;\n    border: 2px solid #EEEEEE;\n    border-radius: 5px;\n    padding: 1em;\n    z-index: 5;\n}\n\n#toolbox input {\n    width: 30px;\n    opacity: 0.4;\n}\n\n#toolbox input:hover {\n    opacity: 1;\n    cursor: pointer;\n}\n\n#hidden-file-upload {\n    display: none;\n}\n\n#download-input {\n    margin: 0 1em;\n}\n\n.cyan {\n    background-color: cyan;\n}", ""]);
 // Exports
 module.exports = exports;
 
@@ -36351,176 +36351,6 @@ function serializer(replacer, cycleReplacer) {
 
 /***/ }),
 
-/***/ "./node_modules/jvent/index.js":
-/*!*************************************!*\
-  !*** ./node_modules/jvent/index.js ***!
-  \*************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-function Jvent() {}
-
-/**
- * Adds a listener to the collection for a specified event.
- * @public
- * @function
- * @name Jvent#on
- * @param {string} event Event name.
- * @param {function} listener Listener function.
- * @example
- * // Will add a event listener to the "ready" event
- * var startDoingStuff = function (event, param1, param2, ...) {
- *   // Some code here!
- * };
- *
- * me.on("ready", startDoingStuff);
- */
-Jvent.prototype.on = function(event, listener) {
-  this._collection = this._collection || {};
-  this._collection[event] = this._collection[event] || [];
-  this._collection[event].push(listener);
-  return this;
-};
-
-/**
- * Adds a one time listener to the collection for a specified event. It will execute only once.
- * @public
- * @function
- * @name Jvent#once
- * @param {string} event Event name.
- * @param {function} listener Listener function.
- * @returns itself
- * @example
- * // Will add a event handler to the "contentLoad" event once
- * me.once("contentLoad", startDoingStuff);
- */
-Jvent.prototype.once = function (event, listener) {
-  var that = this;
-
-  function fn() {
-    that.off(event, fn);
-    listener.apply(this, arguments);
-  }
-
-  fn.listener = listener;
-
-  this.on(event, fn);
-
-  return this;
-};
-
-/**
- * Removes a listener from the collection for a specified event.
- * @public
- * @function
- * @name Jvent#off
- * @param {string} event Event name.
- * @param {function} listener Listener function.
- * @returns itself
- * @example
- * // Will remove event handler to the "ready" event
- * var startDoingStuff = function () {
- *   // Some code here!
- * };
- *
- * me.off("ready", startDoingStuff);
- */
-Jvent.prototype.off = function (event, listener) {
-
-  var listeners = this._collection && this._collection[event],
-      j = 0;
-
-  if (listeners !== undefined) {
-    for (j; j < listeners.length; j += 1) {
-      if (listeners[j] === listener || listeners[j].listener === listener) {
-        listeners.splice(j, 1);
-        break;
-      }
-    }
-
-    if (listeners.length === 0) {
-      this.removeAllListeners(event);
-    }
-  }
-
-  return this;
-};
-
-/**
- * Removes all listeners from the collection for a specified event.
- * @public
- * @function
- * @name Jvent#removeAllListeners
- * @param {string} event Event name.
- * @returns itself
- * @example
- * me.removeAllListeners("ready");
- */
-Jvent.prototype.removeAllListeners = function (event) {
-  this._collection = this._collection || {};
-  delete this._collection[event];
-  return this;
-};
-
-/**
- * Returns all listeners from the collection for a specified event.
- * @public
- * @function
- * @name Jvent#listeners
- * @param {string} event Event name.
- * @returns Array
- * @example
- * me.listeners("ready");
- */
-Jvent.prototype.listeners = function (event) {
-  this._collection = this._collection || {};
-  return this._collection[event];
-};
-
-/**
- * Execute each item in the listener collection in order with the specified data.
- * @name Jvent#emit
- * @public
- * @protected
- * @param {string} event The name of the event you want to emit.
- * @param {...object} var_args Data to pass to the listeners.
- * @example
- * // Will emit the "ready" event with "param1" and "param2" as arguments.
- * me.emit("ready", "param1", "param2");
- */
-Jvent.prototype.emit = function () {
-  if (this._collection === undefined) {
-    return this;
-  }
-
-  var args = [].slice.call(arguments, 0), // converted to array
-      event = args.shift(),
-      listeners = this._collection[event],
-      i = 0,
-      len;
-
-  if (listeners) {
-    listeners = listeners.slice(0);
-    len = listeners.length;
-    for (i; i < len; i += 1) {
-      listeners[i].apply(this, args);
-    }
-  }
-
-  return this;
-};
-
-/**
- * Expose Jvent
- */
-module.exports = Jvent;
-
-
-/***/ }),
-
 /***/ "./node_modules/performance-now/lib/performance-now.js":
 /*!*************************************************************!*\
   !*** ./node_modules/performance-now/lib/performance-now.js ***!
@@ -47610,14 +47440,14 @@ function sortAlphaNum(a, b) {
   }
 }
 
-var Clone = function Clone(obj) {
+var clone = function clone(obj) {
   var newObj = obj instanceof Array ? [] : {};
 
   for (i in obj) {
     if (i == 'clone') continue;
 
     if (obj[i] && _typeof2(obj[i]) == "object") {
-      newObj[i] = Clone(obj[i]);
+      newObj[i] = clone(obj[i]);
     } else newObj[i] = obj[i];
   }
 
@@ -47677,7 +47507,7 @@ module.exports = {
   isObject: isObject,
   isFunction: isFunction,
   nop: nop,
-  Clone: Clone,
+  clone: clone,
   AngleBetweenDot: AngleBetweenDot,
   Dot: Dot,
   DistOptimized: DistOptimized,
@@ -50536,13 +50366,14 @@ module.exports = content.locals || {};
 /*!*************************************************!*\
   !*** ./src/scripts/wolfram-model/cytostyles.js ***!
   \*************************************************/
-/*! exports provided: cytostyle, ehStyle */
+/*! exports provided: cytostyle, ehStyle, colorPalette */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "cytostyle", function() { return cytostyle; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ehStyle", function() { return ehStyle; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "colorPalette", function() { return colorPalette; });
 var KolorWheel = __webpack_require__(/*! ../../lib/3rd-party/kolorwheel */ "./src/lib/3rd-party/kolorwheel.js").KolorWheel;
 
 var colors = ['#eaff7b', '#00ffab', '#29bdc1', '#d84242', '#913f92'];
@@ -50610,7 +50441,8 @@ for (var i = 0; i < 10; i++) {
   cytostyle.push({
     selector: 'edge[iteration=' + i + ']',
     style: {
-      'line-color': colorPalette[i]
+      'line-color': colorPalette[i],
+      'target-arrow-color': colorPalette[i]
     }
   });
 }
@@ -50914,9 +50746,9 @@ var Graph = __webpack_require__(/*! ../../lib/graph */ "./src/lib/graph.js").Gra
 
 var jss = __webpack_require__(/*! json-stringify-safe */ "./node_modules/json-stringify-safe/stringify.js");
 
-var $ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
+var $ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js"); //const term = require('../../lib/3rd-party/jsterm/src/sandbox-console.js');
+//require('../../lib/3rd-party/jsterm/src/sandbox.css');
 
-var Jvent = __webpack_require__(/*! jvent */ "./node_modules/jvent/index.js");
 
 var ace = __webpack_require__(/*! brace */ "./node_modules/brace/index.js");
 
@@ -50932,6 +50764,22 @@ String.prototype.replaceAt = function (index, replacement) {
 
 var sampleStartFind = [["a", "b"], ["b", "a"]];
 var samplereplaceWith = [['a', 'b'], ['b', 'c'], ['c', 'd'], ['d', 'e'], ['e', 'f'], ['f', 'a'], ['a', 'f'], ['f', 'e'], ['e', 'd'], ['d', 'c'], ['c', 'b'], ['b', 'a'], ['g', 'a'], ['a', 'g'], ['g', 'b'], ['b', 'g'], ['g', 'c'], ['c', 'g'], ['g', 'd'], ['d', 'g'], ['g', 'e'], ['e', 'g'], ['g', 'f'], ['f', 'g']];
+var consoleUi = "\n\n";
+
+var createConsole = function createConsole() {
+  $(document).ready(function () {
+    $('<div id="sandbox">sandbox loading...</div>').appendTo('#layout');
+    window.sandbox = new Sandbox.View({
+      el: $('#sandbox'),
+      model: new Sandbox.Model(),
+      resultPrefix: "  => ",
+      helpText: "type javascript commands into the console, hit enter to evaluate. \n[up/down] to scroll through history, ':clear' to reset it. \n[alt + return/up/down] for returns and multi-line editing.",
+      tabCharacter: "\t",
+      placeholder: "// type some javascript and hit enter (:help for info)"
+    });
+  });
+};
+
 var cy,
     app,
     iterations = 0,
@@ -51054,7 +50902,7 @@ var initGraph = function initGraph(a) {
         console.log(e);
       }
     }
-  });
+  }); //createConsole();
 };
 
 var reset = function reset() {
@@ -51308,23 +51156,85 @@ var _showGraph = function _showGraph(updated) {
   //     }]
   // });
 
-  cy.addListener("mousedown", "node", function (event) {
-    var hood = event.target.neighborhood();
-    event.target.addClass('node-highlighted');
-    hood.forEach(function (n) {
-      return n.addClass('node-highlighted');
+  cy.on("click", "node", function (event) {
+    var me = event.target,
+        hood = me.neighborhood(),
+        c = me.style('background-color');
+    hood.forEach(function (el) {
+      return el.data('color', el.style('background-color'));
+    }); //
+
+    me.animation({
+      style: {
+        'background-color': 'cyan'
+      },
+      duration: 100
+    }).play() // start
+    .promise('completed').then(function () {
+      // on next completed
+      me.animation({
+        style: {
+          'background-color': c
+        },
+        duration: 100
+      }).play();
+      hood.forEach(function (el) {
+        el.animation({
+          style: {
+            'background-color': el.data('color')
+          },
+          duration: 100
+        }).play();
+      });
+    }); //
+
+    hood.forEach(function (el) {
+      el.animation({
+        style: {
+          'background-color': 'cyan'
+        },
+        duration: 100
+      }).play();
     });
-    cy.forceRender();
-    console.log('boo');
   });
-  cy.addListener("mouseup", "node", function (event) {
-    var hood = event.target.neighborhood();
-    event.target.removeClass('node-highlighted');
-    hood.forEach(function (n) {
-      return n.removeClass('node-highlighted');
+  cy.on("click", "edge", function (event) {
+    var me = event.target,
+        hood = me.nodes(),
+        c = me.style('line-color');
+    hood.forEach(function (el) {
+      return el.data('color', el.style('line-color'));
     });
-    cy.forceRender();
-    console.log('oob');
+    me.animation({
+      style: {
+        'line-color': 'cyan'
+      },
+      duration: 100
+    }).play() // start
+    .promise('completed').then(function () {
+      // on next completed
+      me.animation({
+        style: {
+          'line-color': c
+        },
+        duration: 100
+      }).play();
+      hood.forEach(function (el) {
+        el.animation({
+          style: {
+            'line-color': el.data('color')
+          },
+          duration: 100
+        }).play();
+      });
+    });
+    hood.forEach(function (el) {
+      el.animation({
+        style: {
+          'line-color': 'cyan'
+        },
+        duration: 100
+      }).play();
+    });
   });
 };
 /**
