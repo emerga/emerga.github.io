@@ -1,0 +1,297 @@
+<script type="text/template" id="tplSandbox">
+    <pre class="output"></pre>
+    <div class="input">
+        <textarea rows="1" placeholder="<%= placeholder %>"></textarea>
+    </div>
+</script>
+
+<script type="text/template" id="tplCommand">
+    <% if (! _hidden) { %><span class="command"><%= command %></span>
+        <span class="prefix"><%= this.resultPrefix %></span><span class="<%= _class %>"><%= result %></span>
+        <% } %>
+</script>
+
+<style>
+    body {
+        font-size: .875rem;
+        font-family: "Lucida Console", "Lucida Sans Typewriter", monaco, "Bitstream Vera Sans Mono", monospace;
+    }
+    
+    .feather {
+        width: 16px;
+        height: 16px;
+        vertical-align: text-bottom;
+    }
+    
+    .sidebar {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 100;
+        /* Behind the navbar */
+        padding: 0;
+        box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+    }
+    
+    .sidebar-sticky {
+        position: -webkit-sticky;
+        position: sticky;
+        top: 48px;
+        height: calc(100vh - 48px);
+        padding-top: .5rem;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+    
+    .sidebar .nav-link {
+        font-weight: 500;
+        color: #333;
+    }
+    
+    .sidebar .nav-link .feather {
+        margin-right: 4px;
+        color: #999;
+    }
+    
+    .sidebar .nav-link.active {
+        color: #007bff;
+    }
+    
+    .sidebar .nav-link:hover .feather,
+    .sidebar .nav-link.active .feather {
+        color: inherit;
+    }
+    
+    .sidebar-heading {
+        font-size: .75rem;
+        text-transform: uppercase;
+    }
+    
+    .graph-data-sidebar {
+        margin-top: 50px;
+    }
+    
+    .navbar-brand {
+        padding-top: .75rem;
+        padding-bottom: .75rem;
+        font-size: 1rem;
+        background-color: rgba(0, 0, 0, .25);
+        box-shadow: inset -1px 0 0 rgba(0, 0, 0, .25);
+    }
+    
+    .navbar .form-control {
+        padding: .75rem 1rem;
+        border-width: 0;
+        border-radius: 0;
+    }
+    
+    .form-control-dark {
+        color: #fff;
+        background-color: rgba(255, 255, 255, .1);
+        border-color: rgba(255, 255, 255, .1);
+    }
+    
+    .form-control-dark:focus {
+        border-color: transparent;
+        box-shadow: 0 0 0 3px rgba(255, 255, 255, .25);
+    }
+    
+    .bodycolor {
+        background-color: #fff;
+    }
+    
+    .border-top {
+        border-top: 1px solid #e5e5e5;
+    }
+    
+    .border-bottom {
+        border-bottom: 1px solid #e5e5e5;
+    }
+    
+    .top-btn {
+        margin-right: 5px;
+    }
+    
+    .top-nav span {
+        color: #17093C;
+    }
+    
+    .control-tabs {
+        margin-bottom: 10px;
+    }
+    
+    #inform {
+        min-height: 400px;
+    }
+    
+    #cy {
+        width: 900px;
+        height: 900px;
+        color: #999;
+    }
+    
+    h2 {
+        color: #CCC
+    }
+    
+    .iterations-output {
+        margin-right: 10px;
+    }
+    
+    .header-info {
+        margin-right: 20px;
+    }
+    
+    .no {
+        background-color: #fff;
+        margin: 3px;
+        padding-top: 15px;
+        border: 1px solid #999;
+        max-height: 600px;
+        overflow: hidden;
+        overflow-y: scroll;
+        text-transform: lowercase;
+    }
+    
+    .copy-icon {
+        margin-right: 10px;
+    }
+    
+    .clickable {
+        cursor: pointer;
+    }
+    
+    .clickable {
+        cursor: pointer;
+    }
+    
+    #cytostyle-input {
+        min-height: 240px;
+    }
+    
+    body {
+        background-color: #17093C;
+    }
+    
+    #toolbox {
+        position: absolute;
+        top: 1;
+        left: 0;
+        margin-bottom: 0.5em;
+        margin-left: 1em;
+        border: 2px solid #EEEEEE;
+        border-radius: 5px;
+        padding: 1em;
+        z-index: 5;
+    }
+    
+    #toolbox input {
+        width: 30px;
+        opacity: 0.4;
+    }
+    
+    #toolbox input:hover {
+        opacity: 1;
+        cursor: pointer;
+    }
+    
+    #hidden-file-upload {
+        display: none;
+    }
+    
+    #download-input {
+        margin: 0 1em;
+    }
+    
+    .cyan {
+        background-color: cyan;
+    }
+</style>
+<!-- navigation -->
+<nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 top-nav">
+    <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">the Omega Cell</a>
+    <span class="num-iterations">0</span> iterations</span>
+</nav>
+<!-- body container -->
+<div class="container-fluid">
+    <!-- container row -->
+    <div class="row">
+        <!-- container left navigation -->
+        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+            <div class="sidebar-sticky">
+                <ul class="nav flex-column mb-2">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <span data-feather="file-text"></span> .
+                        </a>
+                    </li>
+                </ul>
+                <!-- container left navigation - output data-->
+                <h6 class="no sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                    <pre id="node-output" class="d-flex"></pre>
+                </h6>
+                </span>
+        </nav>
+
+        <!-- container main content area -->
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+
+            <!-- container main content header -->
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+                <h1 class="h2">Dashboard</h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <div class="btn-group mr-2">
+                        <!-- <button class="btn btn-sm btn-outline-secondary">Share</button>> -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- cytospace graph-->
+            <div id="cy"></div>
+
+            <!-- tab control pills -->
+            <div class="table-responsive control-tabs">
+                <ul id="controltabs" role="tablist" class="nav nav-pills">
+                    <li class="nav-item active">
+                        <a class="nav-link active" href="#input" id="input-tab" data-toggle="pill" role="tab">input</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#settings" id="settings-tab" data-toggle="pill" role="tab">settings</a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- tab content area -->
+            <div class="input-data tab-content bodycolor">
+                <!-- tab content area - input tab -->
+                <div class="tab-pane active" id="input" role="tabpanel"></div>
+                <!-- tab content area - settings tab -->
+                <div class="tab-pane" data-toggle="tab" id="settings" role="tabpanel"></div>
+            </div>
+
+            <!-- control bar -->
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon1">max: </span>
+                </div>
+                <!-- iteration control -->
+                <input type="text" class="form-control" id="num-iterations-input" placeholder="5">
+                <span class="input-group-text" id="basic-addon2">iterations.&nbsp;&nbsp;&nbsp;&nbsp;
+                    <span class="iterations-output num-iterations">x</span> iterations.
+                </span>
+                <!-- iteration buttons -->
+                <div class="btn-group top-btn" role="group">
+                    <button type="button" id="btn-advance" class="btn btn-success">></button>
+                    <button type="button" id="btn-run" class="btn btn-success">>></button>
+                    <button type="button" id="btn-pause" class="btn btn-warning">||</button>
+                    <button type="button" id="btn-reset" class="btn btn-danger">x</button>
+                </div>
+                <!-- quick status-->
+                <div class="input-group-append">
+                    <span class="input-group-text alert-success" id="quick-status">Ready</span>
+                </div>
+            </div>
+        </main>
+        </div>
+    </div>
