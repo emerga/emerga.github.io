@@ -64266,8 +64266,7 @@ var cytostyle = [{
             'curve-style': 'bezier',
             'target-arrow-shape': 'vee',
             'width': 1,
-            'color': '##fff',
-            'line-color': '#000'
+            'line-color': getColor(0, -0.9)
         }
     }
 ];
@@ -64536,7 +64535,7 @@ var flake1 = [
     ["g", "f"],
     ["f", "g"]
 ];
-var nodes = flake1;
+var nodes = cell4;
 
 
 
@@ -66418,13 +66417,1241 @@ module.exports = {
 
 /***/ }),
 
+/***/ "./src/scripts/critters/entity.js":
+/*!****************************************!*\
+  !*** ./src/scripts/critters/entity.js ***!
+  \****************************************/
+/*! exports provided: Entity */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Entity", function() { return Entity; });
+// entity definition - entity can be food or a creature
+function Entity(x1, y1) {
+  this.x = x1;
+  this.y = y1;
+  this.dx = 0;
+  this.dy = 0;
+  this.rotation = 0;
+
+  this.drawOnCanvas = function (ctx) {};
+
+  this.draw = function () {};
+
+  this.update = function () {};
+}
+
+Entity.prototype.move = function (delta) {
+  this.x += this.dx;
+  this.y += this.dy;
+};
+
+Entity.prototype.setHorizontalMovement = function (dx1) {
+  this.dx = dx1;
+};
+
+Entity.prototype.setVerticalMovement = function (dy1) {
+  this.dy = dy1;
+};
+
+Entity.prototype.getHorizontalMovement = function () {
+  return this.dx;
+};
+
+Entity.prototype.getVerticalMovement = function () {
+  return this.dy;
+};
+
+Entity.prototype.getX = function () {
+  return this.x;
+};
+
+Entity.prototype.getY = function () {
+  return this.y;
+};
+
+Entity.prototype.setY = function (y1) {
+  this.y = y1;
+};
+
+Entity.prototype.setX = function (x1) {
+  this.x = x1;
+};
+
+
+
+/***/ }),
+
+/***/ "./src/scripts/critters/food.js":
+/*!**************************************!*\
+  !*** ./src/scripts/critters/food.js ***!
+  \**************************************/
+/*! exports provided: Food */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Food", function() { return Food; });
+/* harmony import */ var _entity_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./entity.js */ "./src/scripts/critters/entity.js");
+
+Food.prototype.width = 2;
+Food.prototype = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["Entity"]();
+Food.prototype.constructor = Food;
+Food.prototype.radius = 5;
+
+function Food(x, y) {
+  this.setX(x);
+  this.setY(y);
+}
+
+Food.prototype.draw = function () {
+  ctx.beginPath();
+  ctx.arc(Math.floor(this.getX()), Math.floor(this.getY()), Math.floor(this.radius), 0, Math.PI * 2, true);
+  ctx.closePath();
+  ctx.fillStyle = "green";
+  ctx.fill();
+};
+
+Food.prototype.update = function (delta) {};
+
+
+
+/***/ }),
+
+/***/ "./src/scripts/critters/game.js":
+/*!**************************************!*\
+  !*** ./src/scripts/critters/game.js ***!
+  \**************************************/
+/*! exports provided: Game */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Game", function() { return Game; });
+/* harmony import */ var _food_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./food.js */ "./src/scripts/critters/food.js");
+/* harmony import */ var _genome_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./genome.js */ "./src/scripts/critters/genome.js");
+/* harmony import */ var _organism_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./organism.js */ "./src/scripts/critters/organism.js");
+/* harmony import */ var _timer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./timer.js */ "./src/scripts/critters/timer.js");
+/* harmony import */ var _lib_util__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../lib/util */ "./src/lib/util.js");
+/* harmony import */ var _lib_util__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_lib_util__WEBPACK_IMPORTED_MODULE_4__);
+
+
+
+
+
+
+function Game() {
+  this.initialize();
+}
+
+Game.prototype.initialize = function () {
+  this.organisms = [];
+  this.food = [];
+  this.entities = [];
+  this.fittestOrganisms = [];
+  this.bestFitness = 0;
+  this.timeBetweenSpawns = 10000; //in ms
+
+  this.timers = new _timer_js__WEBPACK_IMPORTED_MODULE_3__["Timers"]();
+  var thing = this;
+
+  var call = function call() {
+    thing.createRandomOrganism();
+    thing.timers.add(call, thing.timeBetweenSpawns);
+  };
+
+  this.timers.add(call, this.timeBetweenSpawns);
+  this.then = Date.now();
+  this.fpsUpdateRate = 1;
+  this.timeSinceLastFPSUpdate = 0;
+  this.framesElapsed = 0;
+  this.desiredFPS = 120;
+  this.fps = 0;
+  this.tick = 0;
+
+  for (var i = 0; i < this.numFood; i++) {
+    this.createFood();
+  }
+
+  for (var j = 0; j < this.numOrgs; j++) {
+    this.createRandomOrganism();
+  }
+};
+
+Game.prototype.resize = function () {};
+
+Game.prototype.update = function () {
+  this.timers.update();
+  var now = Date.now();
+  var delta = now - this.then;
+  delta = delta / 1000;
+  this.then = now;
+
+  if (this.food.length < this.numFood) {
+    this.createFood();
+  }
+
+  if (this.organisms.length < this.numOrgs / 4) {
+    this.createRandomOrganism();
+  }
+
+  for (var e = 0; e < this.entities.length; e++) {
+    var ent = this.entities[e];
+    ent.update(delta);
+
+    if (ent.remove) {
+      this.entities.splice(e, 1);
+
+      if (ent instanceof _food_js__WEBPACK_IMPORTED_MODULE_0__["Food"]) {
+        this.food.splice(this.food.indexOf(ent), 1);
+      } else if (ent instanceof _organism_js__WEBPACK_IMPORTED_MODULE_2__["Organism"]) {
+        this.organisms.splice(this.organisms.indexOf(ent), 1);
+        var bfitness = 0;
+
+        for (var forg in this.fittestOrganisms) {
+          forg = this.fittestOrganisms[forg];
+          bfitness = forg.age > bfitness ? forg.age : bfitness;
+        }
+
+        if (ent.age > bfitness) {
+          this.fittestOrganisms.push(ent);
+          this.bestFitness = bfitness;
+          if (this.fittestOrganisms.length > 5) this.fittestOrganisms.shift();
+        }
+      }
+    }
+  }
+
+  this.timeSinceLastFPSUpdate += delta;
+  this.framesElapsed += 1;
+  this.tick += 1;
+  if (this.tick === 86400) this.tick = 0;
+
+  if (this.timeSinceLastFPSUpdate > this.fpsUpdateRate) {
+    this.fps = this.framesElapsed / this.timeSinceLastFPSUpdate;
+    this.framesElapsed = 0;
+    this.timeSinceLastFPSUpdate = 0;
+  }
+};
+
+Game.prototype.render = function () {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  if (this.renderStuff) {
+    for (var e = 0; e < this.entities.length; e++) {
+      var ent = this.entities[e];
+      ent.draw();
+    }
+  }
+
+  ctx.font = 'italic 30px sans-serif';
+  ctx.fillStyle = "rgb(255,255,255)";
+  ctx.fillText(Math.floor(this.bestFitness), 10, 30);
+};
+
+Game.prototype.addFood = function (f) {
+  this.food.push(f);
+  this.entities.push(f);
+};
+
+Game.prototype.getFoodList = function () {
+  return this.food;
+};
+
+Game.prototype.getTick = function () {
+  return this.tick;
+};
+
+Game.prototype.getOrganismList = function () {
+  return this.organisms;
+};
+
+Game.prototype.addOrganism = function (o) {
+  this.organisms.push(o);
+  this.entities.push(o);
+};
+
+Game.prototype.createFood = function () {
+  var middleX = canvas.width / 2;
+  var middleY = canvas.height / 2;
+  var rndX = Object(_lib_util__WEBPACK_IMPORTED_MODULE_4__["RandomClamped"])(0, canvas.width);
+  var rndY = Object(_lib_util__WEBPACK_IMPORTED_MODULE_4__["RandomClamped"])(0, canvas.height);
+
+  while (rndX > middleX - 100 && rndX < middleX + 100) {
+    rndX = Object(_lib_util__WEBPACK_IMPORTED_MODULE_4__["RandomClamped"])(0, canvas.width);
+  }
+
+  while (rndY > middleY - 100 && rndY < middleY + 100) {
+    rndY = Object(_lib_util__WEBPACK_IMPORTED_MODULE_4__["RandomClamped"])(0, canvas.height);
+  }
+
+  this.addFood(new _food_js__WEBPACK_IMPORTED_MODULE_0__["Food"](rndX, rndY));
+};
+
+Game.prototype.createRandomOrganism = function () {
+  var g;
+
+  if (this.fittestOrganisms.length > 0 && false) {
+    g = this.fittestOrganisms[~~(Math.random() * (this.fittestOrganisms.length - 1))].genome;
+
+    for (var i = 0; i < 20; i++) {
+      g.mutateBrain();
+    }
+
+    for (var i = 0; i < 20; i++) {
+      g.mutateColor();
+    }
+
+    for (var i = 0; i < 20; i++) {
+      g.mutateSize();
+    }
+  } else g = new _genome_js__WEBPACK_IMPORTED_MODULE_1__["Genome"](_genome_js__WEBPACK_IMPORTED_MODULE_1__["Genome"].prototype.getNumSensors(), 35, 7);
+
+  var o = new _organism_js__WEBPACK_IMPORTED_MODULE_2__["Organism"](this, Object(_lib_util__WEBPACK_IMPORTED_MODULE_4__["RandomClamped"])(0, canvas.width), Object(_lib_util__WEBPACK_IMPORTED_MODULE_4__["RandomClamped"])(0, canvas.height), g);
+  this.addOrganism(o);
+};
+
+Game.prototype.FindClosestFood = function (x, y) {
+  var best = null;
+  var closestdist = 100000000000;
+
+  for (var i in this.food) {
+    var curFood = this.food[i];
+    var dist = Math.pow(curFood.getX() - x, 2) + Math.pow(curFood.getY() - y, 2);
+
+    if (dist < closestdist) {
+      closestdist = dist;
+      best = curFood;
+    }
+  }
+
+  if (best !== null) return best;else console.log("PROB");
+};
+
+
+
+/***/ }),
+
+/***/ "./src/scripts/critters/genome.js":
+/*!****************************************!*\
+  !*** ./src/scripts/critters/genome.js ***!
+  \****************************************/
+/*! exports provided: Genome */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Genome", function() { return Genome; });
+/* harmony import */ var _sensors_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./sensors.js */ "./src/scripts/critters/sensors.js");
+/* harmony import */ var _lib_util__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../lib/util */ "./src/lib/util.js");
+/* harmony import */ var _lib_util__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_lib_util__WEBPACK_IMPORTED_MODULE_1__);
+
+
+
+function Genome(g
+/*pre-made genome OR numInputs*/
+, numHidden, numOutputs) {
+  this.brain = [];
+  this.color = [];
+  this.size = 0;
+
+  if (g instanceof Genome) {
+    this.brain = Object(_lib_util__WEBPACK_IMPORTED_MODULE_1__["Clone"])(g.brain);
+    this.color = Object(_lib_util__WEBPACK_IMPORTED_MODULE_1__["Clone"])(g.color);
+    this.pigment = Object(_lib_util__WEBPACK_IMPORTED_MODULE_1__["Clone"])(g.pigment);
+    this.size = g.size;
+  } else {
+    this.brain = this.createRandomLayeredBrain(g, numOutputs, numHidden);
+    this.color = this.createRandomColor();
+    this.size = this.createRandomSize();
+  }
+}
+
+Genome.prototype.createRandomLayeredBrain = function (numIn, numOut, numHid) {
+  var allNeurons = [];
+  var inputNeurons = [];
+  var hiddenNeurons1 = [];
+  var hiddenNeurons2 = [];
+  var outputNeurons = [];
+  var neuron = 1;
+  var finalBrain = [];
+
+  for (var i = 0; i < numIn; i++) {
+    allNeurons.push(neuron);
+    inputNeurons.push(neuron++);
+  }
+
+  for (var j = 0; j < numHid; j++) {
+    //Bias
+    allNeurons.push(neuron);
+    hiddenNeurons1.push(neuron++);
+  }
+
+  for (var j = 0; j < numHid; j++) {
+    //Bias
+    allNeurons.push(neuron);
+    hiddenNeurons2.push(neuron++);
+  }
+
+  for (var k = 0; k < numOut; k++) {
+    //Bias
+    allNeurons.push(neuron);
+    outputNeurons.push(neuron++);
+  }
+
+  finalBrain = finalBrain.concat(this.createLayer(inputNeurons, hiddenNeurons1), this.createLayer(hiddenNeurons1, hiddenNeurons2), this.createLayer(hiddenNeurons2, outputNeurons), this.createLayer([0], hiddenNeurons1), this.createLayer([0], hiddenNeurons2), this.createLayer([0], outputNeurons));
+  return finalBrain;
+};
+
+Genome.prototype.createLayer = function (inputNeurons, outputNeurons) {
+  var finalBrain = [];
+
+  for (var out = 0; out < outputNeurons.length; out++) {
+    for (var inp = 0; inp < inputNeurons.length; inp++) {
+      var neuron = [];
+      neuron[0] = Object(_lib_util__WEBPACK_IMPORTED_MODULE_1__["RandomClamped"])(-1, 1);
+      neuron[1] = outputNeurons[out];
+      neuron[2] = inputNeurons[inp];
+      finalBrain.push(neuron);
+    }
+  }
+
+  return finalBrain;
+};
+
+Genome.prototype.createRandomColor = function () {
+  return [Math.floor(Object(_lib_util__WEBPACK_IMPORTED_MODULE_1__["RandomClamped"])(0, 255)), Math.floor(Object(_lib_util__WEBPACK_IMPORTED_MODULE_1__["RandomClamped"])(0, 255)), Math.floor(Object(_lib_util__WEBPACK_IMPORTED_MODULE_1__["RandomClamped"])(0, 255))];
+};
+
+Genome.prototype.createRandomSize = function () {
+  return Math.floor(Object(_lib_util__WEBPACK_IMPORTED_MODULE_1__["RandomClamped"])(this.minSize, this.maxSize));
+};
+
+Genome.prototype.getNumSensors = function () {
+  var sum = 0;
+  var sensors = this.getSensors();
+
+  for (var i = 0; i < sensors.length; i++) {
+    sum += sensors[i].numOutputs;
+  }
+
+  return sum;
+};
+
+Genome.prototype.getSensors = function () {
+  return [new _sensors_js__WEBPACK_IMPORTED_MODULE_0__["VecToFood"](), new _sensors_js__WEBPACK_IMPORTED_MODULE_0__["MyHealth"](), new _sensors_js__WEBPACK_IMPORTED_MODULE_0__["ProximityEye"](-20), new _sensors_js__WEBPACK_IMPORTED_MODULE_0__["ProximityEye"](20),
+  /*new MyTimeSense(), */
+  new _sensors_js__WEBPACK_IMPORTED_MODULE_0__["MyPain"]()];
+};
+
+Genome.prototype.getColor = function () {
+  return this.color;
+};
+
+Genome.prototype.getBrain = function () {
+  return this.brain;
+};
+
+Genome.prototype.getSize = function () {
+  return this.size;
+};
+
+Genome.prototype.mutateBrain = function () {
+  var brn = this.getBrain();
+
+  for (var i = 0; i < brn.length; i++) {
+    if (Math.random() < this.mutationFactor) {
+      //Very rare
+      var toAdd = Object(_lib_util__WEBPACK_IMPORTED_MODULE_1__["RandomClamped"])(-this.maxMutation, this.maxMutation);
+      this.brain[i][0] += toAdd;
+    }
+  }
+};
+
+Genome.prototype.mutateColor = function () {
+  for (var i = 0; i < this.color.length; i++) {
+    if (Math.random() < this.mutationFactor) {
+      //Very rare
+      var toAdd = Object(_lib_util__WEBPACK_IMPORTED_MODULE_1__["RandomClamped"])(-this.colorMutationMax, this.colorMutationMax);
+      this.color[i] += Math.floor(toAdd);
+
+      if (this.color[i] < 0) {
+        this.color[i] = 0;
+      } else if (this.color[i] > 255) {
+        this.color[i] = 255;
+      }
+    }
+  }
+};
+
+Genome.prototype.mutateSize = function () {
+  if (Math.random() < this.mutationFactor) {
+    //Very rare
+    var toAdd = Object(_lib_util__WEBPACK_IMPORTED_MODULE_1__["RandomClamped"])(-this.sizeMutationMax, this.sizeMutationMax);
+    this.size = this.size + toAdd <= this.maxSize ? this.size + toAdd : this.maxSize;
+    this.size = this.size < this.minSize ? this.minSize : this.size;
+  }
+};
+
+Genome.prototype.MutateGenome = function (who) {
+  var newGenome = new Genome(who);
+  newGenome.mutateBrain();
+  newGenome.mutateColor();
+  newGenome.mutateSize();
+  return newGenome;
+};
+
+
+
+/***/ }),
+
+/***/ "./src/scripts/critters/index.js":
+/*!***************************************!*\
+  !*** ./src/scripts/critters/index.js ***!
+  \***************************************/
+/*! exports provided: Critters */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Critters", function() { return Critters; });
+/* harmony import */ var _entity_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./entity.js */ "./src/scripts/critters/entity.js");
+/* harmony import */ var _game_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./game.js */ "./src/scripts/critters/game.js");
+/* harmony import */ var _genome_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./genome.js */ "./src/scripts/critters/genome.js");
+/* harmony import */ var _organism_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./organism.js */ "./src/scripts/critters/organism.js");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
+
+
+
+
+var Critters = /*#__PURE__*/function () {
+  /**
+   * @param {*} emerga 
+   */
+  function Critters(emerga) {
+    _classCallCheck(this, Critters);
+  }
+
+  _createClass(Critters, [{
+    key: "init",
+    value: function init() {
+      var canvas = document.createElement("canvas");
+      var ctx = canvas.getContext("2d");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      document.body.appendChild(canvas);
+      var keysDown = {};
+      addEventListener("keydown", function (e) {
+        keysDown[e.keyCode] = true;
+        if (e.keyCode == 13) game.renderStuff = !game.renderStuff;
+      }, false);
+    }
+  }, {
+    key: "run",
+    value: function run() {
+      _game_js__WEBPACK_IMPORTED_MODULE_1__["Game"].prototype.numFood = 400;
+      _game_js__WEBPACK_IMPORTED_MODULE_1__["Game"].prototype.numOrgs = 100;
+      _game_js__WEBPACK_IMPORTED_MODULE_1__["Game"].prototype.renderStuff = true;
+      _genome_js__WEBPACK_IMPORTED_MODULE_2__["Genome"].prototype.maxSize = 16;
+      _genome_js__WEBPACK_IMPORTED_MODULE_2__["Genome"].prototype.minSize = 4;
+      _genome_js__WEBPACK_IMPORTED_MODULE_2__["Genome"].prototype.mutationFactor = 0.06;
+      _genome_js__WEBPACK_IMPORTED_MODULE_2__["Genome"].prototype.maxMutation = 0.12;
+      _genome_js__WEBPACK_IMPORTED_MODULE_2__["Genome"].prototype.minMutation = 0.003;
+      _genome_js__WEBPACK_IMPORTED_MODULE_2__["Genome"].prototype.sizeMutationMax = 1.3;
+      _genome_js__WEBPACK_IMPORTED_MODULE_2__["Genome"].prototype.colorMutationMax = 20;
+      _organism_js__WEBPACK_IMPORTED_MODULE_3__["Organism"].prototype = new _entity_js__WEBPACK_IMPORTED_MODULE_0__["Entity"]();
+      _organism_js__WEBPACK_IMPORTED_MODULE_3__["Organism"].prototype.constructor = _organism_js__WEBPACK_IMPORTED_MODULE_3__["Organism"];
+      _organism_js__WEBPACK_IMPORTED_MODULE_3__["Organism"].prototype.width = 2;
+      _organism_js__WEBPACK_IMPORTED_MODULE_3__["Organism"].prototype.maxMaxHealth = 30;
+      _organism_js__WEBPACK_IMPORTED_MODULE_3__["Organism"].prototype.minMaxHealth = 7;
+      _organism_js__WEBPACK_IMPORTED_MODULE_3__["Organism"].prototype.healthmultiplier = 1;
+      _organism_js__WEBPACK_IMPORTED_MODULE_3__["Organism"].prototype.healthUpdateInterval = 60;
+      _organism_js__WEBPACK_IMPORTED_MODULE_3__["Organism"].prototype.reproductionInterval = 6 * 60;
+      _organism_js__WEBPACK_IMPORTED_MODULE_3__["Organism"].prototype.maxSpeed = 4;
+      _organism_js__WEBPACK_IMPORTED_MODULE_3__["Organism"].prototype.healthFromFood = 20;
+      _organism_js__WEBPACK_IMPORTED_MODULE_3__["Organism"].prototype.babyDistMin = 10;
+      _organism_js__WEBPACK_IMPORTED_MODULE_3__["Organism"].prototype.babyDistMax = 50;
+      var game = new _game_js__WEBPACK_IMPORTED_MODULE_1__["Game"]();
+
+      var update = function update() {
+        game.update();
+        window.setTimeout(update, 1000 / game.desiredFPS);
+      };
+
+      var render = function render() {
+        game.render();
+        requestAnimFrame(render, canvas);
+      };
+
+      update();
+      render();
+    }
+  }]);
+
+  return Critters;
+}();
+
+
+
+/***/ }),
+
+/***/ "./src/scripts/critters/neural-net.js":
+/*!********************************************!*\
+  !*** ./src/scripts/critters/neural-net.js ***!
+  \********************************************/
+/*! exports provided: NeuralNet */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "NeuralNet", function() { return NeuralNet; });
+/* harmony import */ var _neuron_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./neuron.js */ "./src/scripts/critters/neuron.js");
+
+
+function NeuralNet(myGenome) {
+  var brain = myGenome.getBrain();
+  var inputNeurons = [];
+  var outputNeurons = [];
+  var allNeuronNames = [];
+
+  for (var index = 0; index < brain.length; index++) {
+    //REMEMBER THE BIAS NEURON at 0
+    var currentNeuron = brain[index];
+
+    if (allNeuronNames.indexOf(currentNeuron[2]) == -1) {
+      //If the input neuron isnt in our list of neurons
+      allNeuronNames.push(currentNeuron[2]);
+      inputNeurons.push(currentNeuron[2]);
+      outputNeurons.push(currentNeuron[2]);
+    }
+
+    if (allNeuronNames.indexOf(currentNeuron[1]) == -1) {
+      //If the input neuron isnt in our list of neurons
+      allNeuronNames.push(currentNeuron[1]);
+      inputNeurons.push(currentNeuron[1]);
+      outputNeurons.push(currentNeuron[1]);
+    }
+  }
+
+  for (var cur = 0; cur < brain.length; cur++) {
+    var currentNeuron = brain[cur];
+    var currentInput = currentNeuron[2];
+    var currentOutput = currentNeuron[1];
+
+    if (inputNeurons.indexOf(currentOutput) !== -1) {
+      //if our input neurons list contains a neuron that is receiving an output
+      inputNeurons.splice(inputNeurons.indexOf(currentOutput), 1);
+    }
+
+    if (outputNeurons.indexOf(currentInput) !== -1) {
+      outputNeurons.splice(outputNeurons.indexOf(currentInput), 1);
+    }
+  } //At this point, we have: a list of all unique neurons as well as all input neurons and all output neurons
+
+
+  var neurons = [];
+
+  for (var xxx = 0; xxx < allNeuronNames.length; xxx++) {
+    neurons.push(new _neuron_js__WEBPACK_IMPORTED_MODULE_0__["Neuron"]());
+  }
+
+  for (var yyy = 0; yyy < brain.length; yyy++) {
+    var currentNeuron = brain[yyy];
+    var currentInput = currentNeuron[2];
+    var currentOutput = currentNeuron[1];
+    var currentWeight = currentNeuron[0];
+    neurons[currentOutput].addInput(currentInput, currentWeight);
+  }
+
+  this.neurons = neurons;
+  this.outputNeurons = outputNeurons;
+}
+
+NeuralNet.prototype.getNumInputs = function () {
+  return numInputs;
+};
+
+NeuralNet.prototype.getOutput = function (inputs) {
+  this.neurons[0].setOutput(-1);
+
+  for (var i = 1; i <= inputs.length; i++) {
+    this.neurons[i].setOutput(inputs[i - 1]);
+  }
+
+  for (var neu = inputs.length + 1; neu < this.neurons.length; neu++) {
+    this.neurons[neu].calcOutput(this.neurons);
+  }
+
+  var myReturn = [];
+
+  for (var a = 0; a < this.outputNeurons.length; a++) {
+    myReturn.push(this.neurons[this.outputNeurons[a]].getOutput());
+  }
+
+  return myReturn;
+};
+
+
+
+/***/ }),
+
+/***/ "./src/scripts/critters/neuron.js":
+/*!****************************************!*\
+  !*** ./src/scripts/critters/neuron.js ***!
+  \****************************************/
+/*! exports provided: Neuron */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Neuron", function() { return Neuron; });
+function Neuron() {
+  this.inputSources = [];
+  this.weights = [];
+  this.lastOutput = 0;
+}
+
+Neuron.prototype.addInput = function (inputSource, weight) {
+  this.inputSources.push(inputSource);
+  this.weights.push(weight);
+};
+
+Neuron.prototype.Activation = function (sum) {
+  return 2 / (1 + Math.pow(Math.E, -sum)) - 1;
+};
+
+Neuron.prototype.getOutput = function () {
+  return this.lastOutput;
+};
+
+Neuron.prototype.setOutput = function (val) {
+  this.lastOutput = val;
+};
+
+Neuron.prototype.calcOutput = function (allNeurons) {
+  var sum = 0;
+
+  for (var xxx = 0; xxx < this.inputSources.length; xxx++) {
+    sum += allNeurons[this.inputSources[xxx]].getOutput() * this.weights[xxx];
+  }
+
+  var output = this.Activation(sum);
+  this.lastOutput = output;
+  return output;
+};
+
+
+
+/***/ }),
+
+/***/ "./src/scripts/critters/organism.js":
+/*!******************************************!*\
+  !*** ./src/scripts/critters/organism.js ***!
+  \******************************************/
+/*! exports provided: Organism */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Organism", function() { return Organism; });
+/* harmony import */ var _food_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./food.js */ "./src/scripts/critters/food.js");
+/* harmony import */ var _genome_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./genome.js */ "./src/scripts/critters/genome.js");
+/* harmony import */ var _neural_net_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./neural-net.js */ "./src/scripts/critters/neural-net.js");
+/* harmony import */ var _lib_util__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../lib/util */ "./src/lib/util.js");
+/* harmony import */ var _lib_util__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_lib_util__WEBPACK_IMPORTED_MODULE_3__);
+
+
+
+
+
+function Organism(gamein, x, y, myGenome) {
+  this.game = gamein;
+  this.dx = 1;
+  this.dy = 0;
+  this.x = x;
+  this.y = y;
+  this.angle = 0;
+  this.pigments = [0, 0, 0];
+  this.mouth = 0;
+  this.share = 0;
+  this.pain = 0;
+  this.sinceLastHealthUpdate = 0;
+  this.sinceLastReproductionUpdate = 0;
+  this.age = 0;
+  this.genome = myGenome;
+  this.radius = myGenome.getSize();
+  this.speed = this.maxSpeed * ((myGenome.maxSize - myGenome.getSize()) / myGenome.maxSize) + .5;
+  this.maxHealth = this.maxMaxHealth * (myGenome.getSize() / myGenome.maxSize);
+  if (this.maxHealth < this.minMaxHealth) this.maxHealth = this.minMaxHealth;
+  this.health = this.maxHealth;
+  this.net = new _neural_net_js__WEBPACK_IMPORTED_MODULE_2__["NeuralNet"](myGenome);
+  this.inputs = [];
+  this.colors = myGenome.getColor();
+  this.sensors = myGenome.getSensors();
+}
+
+Organism.prototype.draw = function () {
+  var thisX = Math.floor(this.getX());
+  var thisY = Math.floor(this.getY());
+
+  if (this.mouth != 0) {
+    ctx.beginPath();
+    ctx.fillStyle = "rgba(255,0,0," + this.mouth / 2 + ")";
+    ctx.arc(thisX, thisY, Math.floor(this.radius) * 1.3, 0, Math.PI * 2, true);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  if (this.share != 0) {
+    ctx.beginPath();
+    ctx.fillStyle = "rgba(0,0,255," + this.share / 2 + ")";
+    ctx.arc(thisX, thisY, Math.floor(this.radius) * 1.3, 0, Math.PI * 2, true);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  ctx.beginPath();
+  ctx.fillStyle = "rgb(" + Math.floor(this.colors[0]) + "," + Math.floor(this.colors[1]) + "," + Math.floor(this.colors[2]) + ")";
+  ctx.arc(thisX, thisY, Math.floor(this.radius), 0, Math.PI * 2, true);
+  ctx.closePath();
+  ctx.fill();
+  ctx.beginPath();
+  ctx.fillStyle = "rgb(" + Math.floor(Math.abs(this.pigments[0] * 255)) + "," + Math.floor(Math.abs(this.pigments[1] * 255)) + "," + Math.floor(Math.abs(this.pigments[2] * 255)) + ")";
+  ctx.arc(thisX, thisY, Math.floor(this.radius / 4 * 2.5), 0, Math.PI * 2, true);
+  ctx.closePath();
+  ctx.fill();
+  ctx.beginPath();
+  ctx.fillStyle = "rgba(255,255,255,1)";
+  if (this.pain != 0) ctx.fillStyle = "rgba(255,0,0, " + this.pain + ")";
+  ctx.arc(thisX, thisY, Math.floor(this.radius / 4 * 2), 0, Math.PI * 2, true);
+  ctx.closePath();
+  ctx.fill();
+  ctx.beginPath();
+  ctx.fillStyle = "rgb(0,0,0)";
+  ctx.arc(this.getX() - Math.cos(this.angle) * this.radius / 5, this.getY() - Math.sin(this.angle) * this.radius / 5, Math.floor(this.radius / 4 * 1), 0, Math.PI * 2, true);
+  ctx.closePath(); //Sometimes eye is facing backwards :/   ...    :(
+
+  ctx.fill();
+  ctx.fillStyle = "rgb(0,190, 0)";
+  ctx.fillRect(thisX - 10, thisY - 10, Math.floor(this.getHealth() * 2), 5);
+};
+
+Organism.prototype.update = function () {
+  this.sinceLastHealthUpdate += 1;
+  this.sinceLastReproductionUpdate += 1;
+  this.age += 1;
+
+  if (this.sinceLastReproductionUpdate > this.reproductionInterval && this.health >= this.maxHealth * 0.618) {
+    this.reproduce();
+    this.sinceLastReproductionUpdate = 0;
+  }
+
+  if (this.sinceLastHealthUpdate > this.healthUpdateInterval) {
+    this.health -= 1;
+    this.sinceLastHealthUpdate = 0;
+    if (this.mouth !== 0) this.health -= 2 * this.mouth;
+    if (this.health <= 0) this.remove = true;
+  }
+
+  if (this.remove) return;
+  var killedList = [];
+  var nearbyList = [];
+
+  for (var xxx = 0; xxx < this.game.getOrganismList().length; xxx++) {
+    var org = this.game.getOrganismList()[xxx];
+
+    if (org !== this) {
+      var distance = Object(_lib_util__WEBPACK_IMPORTED_MODULE_3__["DistOptimized"])(this.getX(), this.getY(), org.getX(), org.getY());
+
+      for (var yyy = 0; yyy < this.sensors.length; yyy++) {
+        this.sensors[yyy].onEachOrganism(this, org);
+      }
+
+      var killed = org.remove === false;
+      this.checkCollisions(org);
+      killed = killed && org.remove === true;
+      if (killed) killedList.push(org);
+
+      if (distance <= (this.radius + org.radius) * (this.radius + org.radius) * 4) {
+        nearbyList.push(org);
+      }
+    }
+  }
+
+  for (var k in killedList) {
+    k = killedList[k];
+    var killReward = k.maxHealth / nearbyList.length + 1;
+
+    for (var kk in nearbyList) {
+      kk = nearbyList[kk];
+      kk.health += kk.health + killReward <= kk.maxHealth ? killReward : 0;
+    }
+
+    this.health += this.health + killReward <= this.maxHealth ? killReward : 0;
+  }
+
+  this.checkForFood();
+  this.updateInputs();
+  this.updateOutputs(this.net.getOutput(this.inputs));
+  this.x += this.dx;
+  this.y += this.dy;
+  this.x = this.x < 0 ? 0 : this.x;
+  this.y = this.y < 0 ? 0 : this.y;
+  this.x = this.x > window.innerWidth ? window.innerWidth : this.x;
+  this.y = this.y > window.innerHeight ? window.innerHeight : this.y;
+  this.resetSensors();
+};
+
+Organism.prototype.checkCollisions = function (org) {
+  if (!(this.mouth || this.share)) return;
+  var distance = Object(_lib_util__WEBPACK_IMPORTED_MODULE_3__["Dist"])(this.getX(), this.getY(), org.getX(), org.getY());
+
+  if (distance <= this.radius + org.radius) {
+    if (this.mouth !== 0) {
+      var gain = org.maxHealth * 0.25 * (this.radius / org.radius) * this.mouth;
+      var realGain = 0;
+
+      if (org.health - gain < 0) {
+        realGain = org.health;
+        org.health = 0;
+        org.remove = true;
+      } else {
+        realGain = gain;
+        org.health -= gain;
+      }
+
+      org.pain = 1;
+      if (this.health + gain < this.maxHealth) this.health += gain;else this.health = this.maxHealth;
+    }
+
+    if (this.share !== 0) {
+      var loss = this.maxHealth * 0.05 * this.share;
+
+      if (org.health < org.maxHealth && loss < this.health) {
+        this.health = this.health - loss > 0 ? this.health - loss : 0;
+        org.health = org.health + loss < org.maxHealth ? org.health + loss : org.maxHealth;
+      }
+    }
+  }
+};
+
+Organism.prototype.resetSensors = function () {
+  for (var yyy = 0; yyy < this.sensors.length; yyy++) {
+    this.sensors[yyy].resetMe();
+  }
+};
+
+Organism.prototype.checkForFood = function () {
+  var foodlist = this.game.getFoodList();
+  var best = null;
+  var closestdist = 10000000000;
+
+  for (var fd in foodlist) {
+    var curFood = foodlist[fd];
+    var distance = Object(_lib_util__WEBPACK_IMPORTED_MODULE_3__["Dist"])(this.getX(), this.getY(), curFood.getX(), curFood.getY());
+
+    if (distance < closestdist) {
+      closestdist = distance;
+      best = curFood;
+    }
+
+    if (distance < this.radius + _food_js__WEBPACK_IMPORTED_MODULE_0__["Food"].prototype.radius) {
+      this.health += this.healthFromFood;
+      if (this.health >= this.maxHealth) this.health = this.maxHealth;
+      curFood.remove = true;
+    }
+  }
+
+  if (best !== null) this.closestFood = best;else console.log("PROB");
+};
+
+Organism.prototype.reproduce = function () {
+  if (this.game.organisms.length < this.game.numOrgs * 2) {
+    var org = new Organism(this.game, this.getX() + Object(_lib_util__WEBPACK_IMPORTED_MODULE_3__["RandomClamped"])(this.babyDistMin, this.babyDistMax), this.getY() + Object(_lib_util__WEBPACK_IMPORTED_MODULE_3__["RandomClamped"])(this.babyDistMin, this.babyDistMax), _genome_js__WEBPACK_IMPORTED_MODULE_1__["Genome"].prototype.MutateGenome(this.genome));
+    org.health *= 0.618;
+    this.health *= 0.618;
+    this.game.addOrganism(org);
+  }
+};
+
+Organism.prototype.updateOutputs = function (outs) {
+  var lwheel = outs[0];
+  var rwheel = outs[1]; //System.out.println(lwheel);
+
+  var minRot = .01; //FIX 
+
+  var maxRot = 4.0 / 180 * Math.PI; //FIX
+
+  var trackspeed = lwheel + rwheel;
+  trackspeed *= this.speed;
+  currentSpeed = trackspeed;
+  var rot = lwheel - rwheel;
+  if (Math.abs(rot) < minRot) rot = 0;
+  if (rot > maxRot) rot = maxRot;
+  if (rot < -maxRot) rot = -maxRot;
+  this.angle += rot;
+  this.dx = Math.cos(this.angle);
+  this.dy = Math.sin(this.angle);
+  this.dx *= trackspeed;
+  this.dy *= trackspeed;
+  var pigmentr = outs[2];
+  var pigmentg = outs[3];
+  var pigmentb = outs[4];
+  this.pigments = [pigmentr, pigmentg, pigmentb];
+  this.mouth = outs[5] > 0.5 ? outs[5] : 0;
+  this.share = outs[6] > 0.5 ? outs[6] : 0;
+};
+
+Organism.prototype.updateInputs = function () {
+  this.inputs = [];
+
+  for (var i = 0; i < this.sensors.length; i++) {
+    var curOut = this.sensors[i].getOutput(this, this.game);
+
+    if (curOut instanceof Array) {
+      this.inputs = this.inputs.concat(curOut);
+    } else {
+      this.inputs.push(curOut);
+    }
+  }
+};
+
+Organism.prototype.getHealth = function () {
+  return this.health;
+};
+
+Organism.prototype.getColor = function () {
+  return this.colors;
+};
+
+Organism.prototype.getPigment = function () {
+  return this.pigments;
+};
+
+Organism.prototype.setHealth = function (newHealth) {
+  this.health = newHealth;
+};
+
+
+
+/***/ }),
+
+/***/ "./src/scripts/critters/sensors.js":
+/*!*****************************************!*\
+  !*** ./src/scripts/critters/sensors.js ***!
+  \*****************************************/
+/*! exports provided: Sensor, VecToFood, MyTimeSense, MyHealth, MyPain, ProximityEye */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Sensor", function() { return Sensor; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "VecToFood", function() { return VecToFood; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MyTimeSense", function() { return MyTimeSense; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MyHealth", function() { return MyHealth; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MyPain", function() { return MyPain; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ProximityEye", function() { return ProximityEye; });
+/* harmony import */ var _lib_util__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../lib/util */ "./src/lib/util.js");
+/* harmony import */ var _lib_util__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_lib_util__WEBPACK_IMPORTED_MODULE_0__);
+
+
+function Sensor() {}
+
+Sensor.prototype.numOutputs = 0;
+
+Sensor.prototype.getOutput = function (organism, game) {
+  return 0;
+};
+
+Sensor.prototype.onEachFood = function (food, game) {};
+
+Sensor.prototype.onEachOrganism = function (mainOrg, otherOrg) {};
+
+Sensor.prototype.resetMe = function () {};
+
+VecToFood.prototype = new Sensor();
+VecToFood.prototype.constructor = VecToFood;
+VecToFood.prototype.numOutputs = 1;
+
+function VecToFood() {
+  this.getOutput = function (organism, game) {
+    var closestfood = organism.closestFood;
+
+    if (closestfood) {
+      var angle = Object(_lib_util__WEBPACK_IMPORTED_MODULE_0__["AngleBetween"])(organism.dx, organism.dy, closestfood.getX() - organism.getX(), closestfood.getY() - organism.getY());
+      return angle;
+    }
+  };
+}
+
+MyTimeSense.prototype = new Sensor();
+MyTimeSense.prototype.constructor = MyTimeSense;
+MyTimeSense.prototype.numOutputs = 2;
+
+function MyTimeSense() {
+  this.getOutput = function (organism, game) {
+    return [Math.sin(game.getTick()), Math.cos(game.getTick())];
+  };
+}
+
+MyHealth.prototype = new Sensor();
+MyHealth.prototype.constructor = MyHealth;
+MyHealth.prototype.numOutputs = 1;
+
+function MyHealth() {
+  this.getOutput = function (organism, game) {
+    var hp = organism.health / organism.maxHealth;
+    return hp;
+  };
+}
+
+MyPain.prototype = new Sensor();
+MyPain.prototype.constructor = MyPain;
+MyPain.prototype.numOutputs = 1;
+
+function MyPain() {
+  this.getOutput = function (organism, game) {
+    var pain = organism.pain;
+    organism.pain = organism.pain * 0.618;
+    if (organism.pain < 0.01) organism.pain = 0;
+    return pain;
+  };
+}
+
+ProximityEye.prototype = new Sensor();
+ProximityEye.prototype.constructor = ProximityEye;
+ProximityEye.prototype.theta = Object(_lib_util__WEBPACK_IMPORTED_MODULE_0__["ToRadians"])(20);
+ProximityEye.prototype.numOutputs = 11;
+
+function ProximityEye(anAngle) {
+  this.myAngle = Object(_lib_util__WEBPACK_IMPORTED_MODULE_0__["ToRadians"])(anAngle);
+  this.currentClosest = null;
+
+  this.getOutput = function (organism, game) {
+    var out = [-1, -1, -1, -1, -1, -1, -1, -1];
+
+    if (this.currentClosest) {
+      //if we actually found one in our sight and everything
+      var index = 0;
+      var color = this.currentClosest.getColor();
+
+      for (var i = 0; i < 3; i++) {
+        out[index++] = color[i] / (255 / 2) - 1 + .01;
+      }
+
+      var pigment = this.currentClosest.getPigment();
+
+      for (var i = 0; i < 3; i++) {
+        out[index++] = pigment[i];
+      }
+
+      out[index++] = this.currentClosest.health / this.currentClosest.maxHealth;
+      out[index++] = 1 / this.currentClosestDist;
+      out[index++] = this.currentClosest.mouth;
+      out[index++] = this.currentClosest.share;
+      out[index++] = this.currentClosest.pain;
+    }
+
+    return out;
+  };
+
+  this.onEachOrganism = function (mainOrg, otherOrg) {
+    var dist = Object(_lib_util__WEBPACK_IMPORTED_MODULE_0__["DistOptimized"])(mainOrg.getX(), mainOrg.getY(), otherOrg.getX(), otherOrg.getY());
+    var dotProd = Object(_lib_util__WEBPACK_IMPORTED_MODULE_0__["Dot"])(Math.cos(otherOrg.angle + this.myAngle), Math.sin(otherOrg.angle + this.myAngle), otherOrg.getX() - mainOrg.getX(), otherOrg.getY() - mainOrg.getY());
+
+    if (dotProd > Math.cos(this.theta)) {
+      //If this thing is within our sight range
+      if (this.currentClosest !== null) {
+        var bestDist = Object(_lib_util__WEBPACK_IMPORTED_MODULE_0__["DistOptimized"])(mainOrg.getX(), mainOrg.getY(), this.currentClosest.getX(), this.currentClosest.getY());
+
+        if (dist < bestDist) {
+          this.currentClosest = otherOrg;
+          this.currentClosestDist = Math.sqrt(bestDist);
+        }
+      } else {
+        this.currentClosest = otherOrg;
+        this.currentClosestDist = Object(_lib_util__WEBPACK_IMPORTED_MODULE_0__["Dist"])(mainOrg.getX(), mainOrg.getY(), this.currentClosest.getX(), this.currentClosest.getY());
+      }
+    }
+  };
+
+  this.resetMe = function () {
+    this.currentClosest = null;
+    this.currentClosestDist = null;
+  };
+}
+
+
+
+/***/ }),
+
+/***/ "./src/scripts/critters/timer.js":
+/*!***************************************!*\
+  !*** ./src/scripts/critters/timer.js ***!
+  \***************************************/
+/*! exports provided: Timer, Timers */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Timer", function() { return Timer; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Timers", function() { return Timers; });
+// timers
+function Timer(callback, now, time) {
+  this.call = callback;
+  this.beginning = now;
+  this.time = time;
+  this.done = false;
+}
+
+Timer.prototype.update = function (now) {
+  if (now > this.beginning + this.time) {
+    this.call();
+    this.done = true;
+  }
+};
+
+function Timers() {
+  this.timers = [];
+}
+
+Timers.prototype.update = function () {
+  if (this.timers[0]) {
+    for (var i = 0; i < this.timers.length; i++) {
+      this.timers[i].update(Date.now());
+
+      if (this.timers[i].done == true) {
+        this.timers.splice(i, 1);
+      }
+    }
+  }
+};
+
+Timers.prototype.add = function (callback, time) {
+  this.timers.push(new Timer(callback, Date.now(), time));
+};
+
+
+
+/***/ }),
+
 /***/ "./src/scripts/fractal-of-life/index.js":
 /*!**********************************************!*\
   !*** ./src/scripts/fractal-of-life/index.js ***!
   \**********************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! exports provided: FractalOfLife */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "FractalOfLife", function() { return FractalOfLife; });
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -66565,7 +67792,7 @@ var FractalOfLife = /*#__PURE__*/function () {
   return FractalOfLife;
 }();
 
-module.exports = FractalOfLife;
+
 
 /***/ }),
 
@@ -66936,9 +68163,12 @@ var initUI = function initUI(app) {
 /*!*******************************************!*\
   !*** ./src/scripts/game-of-life/index.js ***!
   \*******************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! exports provided: GameOfLife */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "GameOfLife", function() { return GameOfLife; });
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -67122,7 +68352,7 @@ var GameOfLife = /*#__PURE__*/function () {
   return GameOfLife;
 }();
 
-module.exports = GameOfLife;
+
 
 /***/ }),
 
@@ -67455,26 +68685,6 @@ var OmegaCellUIClass = /** @class */ (function () {
             .removeClass('alert-' + (s === 'success' ? 'danger' : s))
             .addClass('alert-' + (s === 'success' ? s : 'danger'));
     };
-    OmegaCellUIClass.prototype.flash = function (els, ms, cb) {
-        if (ms === void 0) { ms = 100; }
-        var anims = els.map(function (el) { return el.animation({
-            style: {
-                'background-color': 'cyan',
-                'line-color': 'cyan',
-                'target-arrow-color': 'cyan',
-                'width': 3
-            },
-            duration: ms
-        }); });
-        anims.forEach(function (el) { return el.play() // start
-            .promise('completed').then(function () {
-            el
-                .reverse()
-                .rewind()
-                .play()
-                .promise('completed').then(cb);
-        }); });
-    };
     OmegaCellUIClass.prototype.animateTo = function (els, anim, ms, cb) {
         if (ms === void 0) { ms = 20; }
         var animData = Object.assign({
@@ -67515,7 +68725,7 @@ var OmegaCellUIClass = /** @class */ (function () {
         var cyElement = OmegaCellUI._cy.$id(id), i = parseInt(cyElement.data('iteration'));
         if (!cyElement)
             return;
-        cyElement.data('value', v);
+        cyElement.data('value', v.toString());
         if (cyElement.isEdge()) {
             var c = Object(_lib_omega_cytostyle__WEBPACK_IMPORTED_MODULE_2__["getColor"])(i, v === 1 ? -0.05 : -0.95);
             elStyle = {
@@ -67538,7 +68748,7 @@ var OmegaCellUIClass = /** @class */ (function () {
                 }
             };
         }
-        OmegaCellUI.animateTo(cyElement, elStyle, 80, function () { });
+        OmegaCellUI.animateTo(cyElement, elStyle, 90, function () { });
     };
     OmegaCellUIClass.prototype.init = function () {
         var self = this;
@@ -67625,9 +68835,12 @@ module.exports = content.locals || {};
 /*!**********************************************!*\
   !*** ./src/scripts/particle-galaxy/index.js ***!
   \**********************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! exports provided: ParticleGalaxy */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ParticleGalaxy", function() { return ParticleGalaxy; });
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -67902,7 +69115,7 @@ var ParticleGalaxy = /*#__PURE__*/function () {
   return ParticleGalaxy;
 }();
 
-module.exports = ParticleGalaxy;
+
 
 /***/ }),
 
@@ -67910,9 +69123,12 @@ module.exports = ParticleGalaxy;
 /*!*******************************!*\
   !*** ./src/scripts/sample.js ***!
   \*******************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/*! exports provided: Sample */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Sample", function() { return Sample; });
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -68029,7 +69245,7 @@ var Sample = /*#__PURE__*/function () {
   return Sample;
 }();
 
-module.exports = Sample;
+
 
 /***/ }),
 
@@ -68044,16 +69260,26 @@ module.exports = Sample;
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "EmergaScripts", function() { return EmergaScripts; });
 /* harmony import */ var _omega_cell_index__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./omega-cell/index */ "./src/scripts/omega-cell/index.ts");
+/* harmony import */ var _game_of_life_index__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./game-of-life/index */ "./src/scripts/game-of-life/index.js");
+/* harmony import */ var _fractal_of_life_index__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./fractal-of-life/index */ "./src/scripts/fractal-of-life/index.js");
+/* harmony import */ var _particle_galaxy_index__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./particle-galaxy/index */ "./src/scripts/particle-galaxy/index.js");
+/* harmony import */ var _wolfram_model_index__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./wolfram-model/index */ "./src/scripts/wolfram-model/index.js");
+/* harmony import */ var _critters_index__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./critters/index */ "./src/scripts/critters/index.js");
+
+
+
+
+
 
 var EmergaScriptsClass = /** @class */ (function () {
     function EmergaScriptsClass() {
         this._scripts = {
             Sample: __webpack_require__(/*! ./sample */ "./src/scripts/sample.js"),
-            FractalOfLife: __webpack_require__(/*! ./fractal-of-life */ "./src/scripts/fractal-of-life/index.js"),
-            WolframModel: __webpack_require__(/*! ./wolfram-model */ "./src/scripts/wolfram-model/index.js"),
-            ParticleGalaxy: __webpack_require__(/*! ./particle-galaxy */ "./src/scripts/particle-galaxy/index.js"),
-            GameOfLife: __webpack_require__(/*! ./game-of-life */ "./src/scripts/game-of-life/index.js"),
-            Critters: __webpack_require__(/*! ./sample */ "./src/scripts/sample.js"),
+            FractalOfLife: _fractal_of_life_index__WEBPACK_IMPORTED_MODULE_2__["FractalOfLife"],
+            WolframModel: _wolfram_model_index__WEBPACK_IMPORTED_MODULE_4__["WolframModel"],
+            ParticleGalaxy: _particle_galaxy_index__WEBPACK_IMPORTED_MODULE_3__["ParticleGalaxy"],
+            GameOfLife: _game_of_life_index__WEBPACK_IMPORTED_MODULE_1__["GameOfLife"],
+            Critters: _critters_index__WEBPACK_IMPORTED_MODULE_5__["Critters"],
             OmegaCell: _omega_cell_index__WEBPACK_IMPORTED_MODULE_0__["OmegaCell"],
         };
     }
@@ -68249,9 +69475,12 @@ module.exports = "<style>\n    body {\n        font-size: .875rem;\n        font
 /*!********************************************!*\
   !*** ./src/scripts/wolfram-model/index.js ***!
   \********************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! exports provided: WolframModel */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "WolframModel", function() { return WolframModel; });
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -68452,7 +69681,8 @@ var InteractiveWolframModel = /*#__PURE__*/function () {
   return InteractiveWolframModel;
 }();
 
-module.exports = InteractiveWolframModel;
+var WolframModel = InteractiveWolframModel;
+
 
 /***/ }),
 
