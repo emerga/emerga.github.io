@@ -62879,6 +62879,7 @@ function pSBC(p, c0, c1, l) {
 }
 
 
+var flake1 = [["bf", "ad"], ["ad", "bf"], ["bf", "ae"], ["ae", "bf"], ["be", "bf"], ["bf", "be"], ["ae", "be"], ["be", "ae"], ["bd", "be"], ["be", "bd"], ["d", "be"], ["be", "d"], ["d", "bd"], ["bd", "d"], ["e", "bd"], ["bd", "e"], ["ab", "bc"], ["bc", "ab"], ["bb", "bc"], ["bc", "bb"], ["aa", "bc"], ["bc", "aa"], ["aa", "bb"], ["bb", "aa"], ["ba", "bb"], ["bb", "ba"], ["b", "bb"], ["bb", "b"], ["b", "ba"], ["ba", "b"], ["a", "ba"], ["ba", "a"], ["ae", "d"], ["d", "ae"], ["aa", "b"], ["b", "aa"], ["aa", "ab"], ["ab", "ac"], ["ac", "ad"], ["ad", "ae"], ["ae", "c"], ["c", "aa"], ["aa", "c"], ["c", "ae"], ["ae", "ad"], ["ad", "ac"], ["ac", "ab"], ["ab", "aa"], ["ag", "aa"], ["aa", "ag"], ["ag", "ab"], ["ab", "ag"], ["ag", "ac"], ["ac", "ag"], ["ag", "ad"], ["ad", "ag"], ["ag", "ae"], ["ae", "ag"], ["ag", "c"], ["c", "ag"], ["a", "b"], ["b", "c"], ["c", "d"], ["d", "e"], ["e", "f"], ["f", "a"], ["a", "f"], ["f", "e"], ["e", "d"], ["d", "c"], ["c", "b"], ["b", "a"], ["g", "a"], ["a", "g"], ["g", "b"], ["b", "g"], ["g", "c"], ["c", "g"], ["g", "d"], ["d", "g"], ["g", "e"], ["e", "g"], ["g", "f"], ["f", "g"]];
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../node_modules/webpack/buildin/harmony-module.js */ "./node_modules/webpack/buildin/harmony-module.js")(module)))
 
 /***/ }),
@@ -64248,13 +64249,12 @@ var createColorPalette = function () {
 };
 var colorPalette = createColorPalette();
 var getColor = function (iteration, brightness) {
-    console.log(brightness);
     return Object(_lib_color__WEBPACK_IMPORTED_MODULE_0__["pSBC"])(brightness, colorPalette[iteration], '#000', false);
 };
 var cytostyle = [{
         selector: 'node',
         style: {
-            'label': 'data(id)',
+            'label': 'data(value)',
             'text-valign': 'center',
             'color': '#000000',
             'background-color': getColor(0, -0.9)
@@ -64262,18 +64262,15 @@ var cytostyle = [{
     }, {
         selector: 'edge',
         style: {
+            'label': 'data(value)',
             'curve-style': 'bezier',
-            'target-arrow-shape': 'triangle',
-            'target-arrow-color': 'black',
+            'target-arrow-shape': 'vee',
             'width': 1,
+            'color': '##fff',
             'line-color': '#000'
         }
-    }, {
-        selector: 'node[name]',
-        style: {
-            'content': 'data(name)'
-        }
-    }];
+    }
+];
 for (var i = 0; i < 10; i++) {
     for (var j = 0; j < 10; j++) {
         cytostyle.push({
@@ -64285,12 +64282,14 @@ for (var i = 0; i < 10; i++) {
     }
 }
 for (var i = 0; i < 10; i++) {
-    for (var j = 0; j < 10; j++) {
+    for (var j = 0; j < 2; j++) {
+        var inten = j === 0 ? 0.9 : 0.1;
         cytostyle.push({
             selector: 'edge[iteration=' + i + '][value=' + j + ']',
             style: {
-                'line-color': getColor(i, -(1 - ((j + 1) / 10))),
-                'target-arrow-color': getColor(i, -(1 - ((j + 1) / 10)))
+                'width': 1,
+                'line-color': getColor(i, inten),
+                'target-arrow-color': getColor(i, inten)
             }
         });
     }
@@ -64353,7 +64352,7 @@ cytostyle = cytostyle.concat(ehStyle);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "nodes", function() { return nodes; });
-var nodes = [
+var cell4 = [
     ["a", "b", { "i": 0 }],
     ["a", "f", { "i": 0 }],
     ["a", "g", { "i": 0 }],
@@ -64451,6 +64450,93 @@ var nodes = [
     ["g", "e", { "i": 3 }],
     ["g", "f", { "i": 3 }]
 ];
+var flake1 = [
+    ["bf", "ad"],
+    ["ad", "bf"],
+    ["bf", "ae"],
+    ["ae", "bf"],
+    ["be", "bf"],
+    ["bf", "be"],
+    ["ae", "be"],
+    ["be", "ae"],
+    ["bd", "be"],
+    ["be", "bd"],
+    ["d", "be"],
+    ["be", "d"],
+    ["d", "bd"],
+    ["bd", "d"],
+    ["e", "bd"],
+    ["bd", "e"],
+    ["ab", "bc"],
+    ["bc", "ab"],
+    ["bb", "bc"],
+    ["bc", "bb"],
+    ["aa", "bc"],
+    ["bc", "aa"],
+    ["aa", "bb"],
+    ["bb", "aa"],
+    ["ba", "bb"],
+    ["bb", "ba"],
+    ["b", "bb"],
+    ["bb", "b"],
+    ["b", "ba"],
+    ["ba", "b"],
+    ["a", "ba"],
+    ["ba", "a"],
+    ["ae", "d"],
+    ["d", "ae"],
+    ["aa", "b"],
+    ["b", "aa"],
+    ["aa", "ab"],
+    ["ab", "ac"],
+    ["ac", "ad"],
+    ["ad", "ae"],
+    ["ae", "c"],
+    ["c", "aa"],
+    ["aa", "c"],
+    ["c", "ae"],
+    ["ae", "ad"],
+    ["ad", "ac"],
+    ["ac", "ab"],
+    ["ab", "aa"],
+    ["ag", "aa"],
+    ["aa", "ag"],
+    ["ag", "ab"],
+    ["ab", "ag"],
+    ["ag", "ac"],
+    ["ac", "ag"],
+    ["ag", "ad"],
+    ["ad", "ag"],
+    ["ag", "ae"],
+    ["ae", "ag"],
+    ["ag", "c"],
+    ["c", "ag"],
+    ["a", "b"],
+    ["b", "c"],
+    ["c", "d"],
+    ["d", "e"],
+    ["e", "f"],
+    ["f", "a"],
+    ["a", "f"],
+    ["f", "e"],
+    ["e", "d"],
+    ["d", "c"],
+    ["c", "b"],
+    ["b", "a"],
+    ["g", "a"],
+    ["a", "g"],
+    ["g", "b"],
+    ["b", "g"],
+    ["g", "c"],
+    ["c", "g"],
+    ["g", "d"],
+    ["d", "g"],
+    ["g", "e"],
+    ["e", "g"],
+    ["g", "f"],
+    ["f", "g"]
+];
+var nodes = flake1;
 
 
 
@@ -65154,13 +65240,12 @@ var Ω = /** @class */ (function () {
     };
     Ω.prototype.reset = function () {
         var self = this;
-        this.grid.edges.forEachValue(function (hg) {
-            hg.value = 0;
-            self.doElementUpdated(hg.id, hg.value);
+        this._grid = new _hypergrid__WEBPACK_IMPORTED_MODULE_0__["HyperGrid"](_hg_define__WEBPACK_IMPORTED_MODULE_1__["nodes"]);
+        this._grid.nodes.values.forEach(function (el) {
+            return self.setElementValue(el.id, 0);
         });
-        this.grid.nodes.forEachValue(function (hg) {
-            hg.value = 0;
-            self.doElementUpdated(hg.id, hg.value);
+        this._grid.edges.values.forEach(function (el) {
+            return self.setElementValue(el.id, 0);
         });
     };
     Ω.getInstance = function (cy, opts) {
@@ -66835,7 +66920,8 @@ var animate = function animate(app) {
 
 var initUI = function initUI(app) {
   renderSettings = new RenderingSettings(app);
-  app.emerga.initStats(0).initGUI('gui', {
+  app.emerga // .initStats(0)
+  .initGUI('gui', {
     preset: 'Fractal of Life'
   });
   initCanvas(app);
@@ -67136,7 +67222,8 @@ var initControls = function initControls(app) {
 
 
 var initUI = function initUI(app) {
-  app.emerga.initStats(0).initGUI('gui', {
+  app.emerga //  .initStats(0)
+  .initGUI('gui', {
     load: JSON,
     preset: 'Game of Life'
   });
@@ -67389,7 +67476,7 @@ var OmegaCellUIClass = /** @class */ (function () {
         }); });
     };
     OmegaCellUIClass.prototype.animateTo = function (els, anim, ms, cb) {
-        if (ms === void 0) { ms = 100; }
+        if (ms === void 0) { ms = 20; }
         var animData = Object.assign({
             duration: ms
         }, anim);
@@ -67428,12 +67515,15 @@ var OmegaCellUIClass = /** @class */ (function () {
         var cyElement = OmegaCellUI._cy.$id(id), i = parseInt(cyElement.data('iteration'));
         if (!cyElement)
             return;
+        cyElement.data('value', v);
         if (cyElement.isEdge()) {
-            var c = Object(_lib_omega_cytostyle__WEBPACK_IMPORTED_MODULE_2__["getColor"])(i, v === 1 ? -0.1 : -0.9);
+            var c = Object(_lib_omega_cytostyle__WEBPACK_IMPORTED_MODULE_2__["getColor"])(i, v === 1 ? -0.05 : -0.95);
             elStyle = {
                 "style": {
+                    "label": "data(value)",
                     "line-color": c,
-                    'target-arrow-color': c
+                    'target-arrow-color': c,
+                    "width": v === 0 ? 1 : 2
                 }
             };
         }
@@ -67443,11 +67533,12 @@ var OmegaCellUIClass = /** @class */ (function () {
             var c = Object(_lib_omega_cytostyle__WEBPACK_IMPORTED_MODULE_2__["getColor"])(i, -(adj));
             elStyle = {
                 "style": {
+                    "label": 'data(value)',
                     "background-color": c
                 }
             };
         }
-        OmegaCellUI.animateTo(cyElement, elStyle, 100, function () { });
+        OmegaCellUI.animateTo(cyElement, elStyle, 80, function () { });
     };
     OmegaCellUIClass.prototype.init = function () {
         var self = this;
@@ -67460,7 +67551,7 @@ var OmegaCellUIClass = /** @class */ (function () {
                 self.ω.evaluate();
             });
             jquery__WEBPACK_IMPORTED_MODULE_0___default()('#btn-run').click(function () {
-                animTimer = setInterval(function () { return self.ω.evaluate(); }, 500);
+                animTimer = setInterval(function () { return self.ω.evaluate(); }, 100);
             });
             jquery__WEBPACK_IMPORTED_MODULE_0___default()('#btn-pause').click(function () {
                 clearInterval(animTimer);
@@ -67472,24 +67563,25 @@ var OmegaCellUIClass = /** @class */ (function () {
             jquery__WEBPACK_IMPORTED_MODULE_0___default()('#num-iterations-input').change(function () {
             });
             jquery__WEBPACK_IMPORTED_MODULE_0___default()(window).resize(function () { return self.resizeGraphArea(); });
+            jquery__WEBPACK_IMPORTED_MODULE_0___default()(document).ready(function () {
+                self._cy = self._ω.toCytograph('cy');
+                process.nextTick(function () {
+                    self._cy.on('click', 'node', function (event) {
+                        var v = event.target.data('value') + 5;
+                        self.ω.setElementValue(event.target.data('id'), v);
+                    });
+                    self._cy.on('click', 'edge', function (event) {
+                        self.ω.setElementValue(event.target.data('id'), 1);
+                    });
+                    self.createConsole();
+                    self.resizeGraphArea();
+                });
+            });
         });
         //
     };
     OmegaCellUIClass.prototype.run = function () {
         var self = this;
-        jquery__WEBPACK_IMPORTED_MODULE_0___default()(document).ready(function () {
-            self._cy = self._ω.toCytograph('cy');
-            process.nextTick(function () {
-                self._cy.on('click', 'node', function (event) {
-                    self.ω.setElementValue(event.target.data('id'), 10);
-                });
-                self._cy.on('click', 'edge', function (event) {
-                    self.ω.setElementValue(event.target.data('id'), 1);
-                });
-                self.createConsole();
-                self.resizeGraphArea();
-            });
-        });
     };
     return OmegaCellUIClass;
 }());
