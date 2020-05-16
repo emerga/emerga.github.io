@@ -68725,7 +68725,7 @@ var OmegaCellUIClass = /** @class */ (function () {
         var cyElement = OmegaCellUI._cy.$id(id), i = parseInt(cyElement.data('iteration'));
         if (!cyElement)
             return;
-        cyElement.data('value', v.toString());
+        cyElement.data('value', v);
         if (cyElement.isEdge()) {
             var c = Object(_lib_omega_cytostyle__WEBPACK_IMPORTED_MODULE_2__["getColor"])(i, v === 1 ? -0.05 : -0.95);
             elStyle = {
