@@ -53564,7 +53564,7 @@ var defaults = {
   // so you can't drag nodes during layout
   fit: true,
   // on every layout reposition of nodes, fit the viewport
-  padding: 30,
+  padding: 10,
   // padding around the simulation
   boundingBox: undefined,
   // constrain layout bounds; { x1, y1, x2, y2 } or { x1, y1, w, h }
@@ -71851,20 +71851,23 @@ var createColorPalette = function () {
 };
 var colorPalette = createColorPalette();
 var getColor = function (iteration, brightness) {
+    if (!iteration || iteration === null)
+        iteration = 0;
     return Object(_lib_color__WEBPACK_IMPORTED_MODULE_0__["pSBC"])(brightness, colorPalette[iteration], '#000', false);
 };
 var cytostyle = [{
         selector: 'node',
         style: {
-            // 'label': 'data(value)',
-            'label': 'data(id)',
+            'label': 'data(value)',
+            'width': 8,
+            'height': 8,
             'text-valign': 'center',
             'background-color': getColor(0, -0.9)
         }
     }, {
         selector: 'edge',
         style: {
-            // 'label': 'data(value)',
+            'label': 'data(value)',
             'curve-style': 'bezier',
             'target-arrow-shape': 'vee',
             'width': 1,
@@ -71872,6 +71875,28 @@ var cytostyle = [{
         }
     }
 ];
+for (var i = 0; i < 10; i++) {
+    for (var j = 0; j < 10; j++) {
+        var inten = 1 - ((j + 1) / 10);
+        cytostyle.push({
+            selector: 'node[value=' + j + ']',
+            style: {
+                'color': Object(_lib_color__WEBPACK_IMPORTED_MODULE_0__["pSBC"])(-inten, '#fff', '#000', false),
+            }
+        });
+    }
+}
+for (var i = 0; i < 10; i++) {
+    for (var j = 0; j < 10; j++) {
+        var inten = 1 - ((j + 1) / 10);
+        cytostyle.push({
+            selector: 'edge[value=' + j + ']',
+            style: {
+                'color': Object(_lib_color__WEBPACK_IMPORTED_MODULE_0__["pSBC"])(-inten, '#fff', '#000', false),
+            }
+        });
+    }
+}
 for (var i = 0; i < 10; i++) {
     for (var j = 0; j < 10; j++) {
         var inten = 1 - ((j + 1) / 10);
@@ -72016,6 +72041,21 @@ var hexGraph = function (length, width, fringe) {
     }
     return links;
 };
+var randomGraph = function (numNodes, numEdges) {
+    var kg = new _stringid__WEBPACK_IMPORTED_MODULE_0__["StringIdGenerator"](), makeK = function () {
+        var keys = {};
+        for (var i = 0; i < numNodes; i++) {
+            var k = kg.next();
+            keys[k] = k;
+        }
+        return Object.values(keys);
+    }, ns = makeK(), es = [];
+    for (var i = 0; i < numEdges; i++) {
+        var l = ns.length, i0 = ~~(Math.random() * l), i1 = ~~(Math.random() * l);
+        es.push([ns[i0], ns[i1]]);
+    }
+    return es;
+};
 var cell4 = [["a", "b", { "i": 0 }], ["a", "f", { "i": 0 }], ["a", "g", { "i": 0 }], ["b", "c", { "i": 0 }], ["b", "a", { "i": 0 }], ["b", "g", { "i": 0 }], ["c", "d", { "i": 0 }], ["c", "b", { "i": 0 }], ["c", "g", { "i": 0 }], ["d", "e", { "i": 0 }], ["d", "c", { "i": 0 }], ["d", "g", { "i": 0 }], ["e", "f", { "i": 0 }], ["e", "d", { "i": 0 }], ["e", "g", { "i": 0 }], ["f", "a", { "i": 0 }], ["f", "e", { "i": 0 }], ["f", "g", { "i": 0 }], ["g", "a", { "i": 0 }], ["g", "b", { "i": 0 }], ["g", "c", { "i": 0 }], ["g", "d", { "i": 0 }], ["g", "e", { "i": 0 }], ["g", "f", { "i": 0 }], ["a", "b", { "i": 1 }], ["a", "f", { "i": 1 }], ["a", "g", { "i": 1 }], ["b", "c", { "i": 1 }], ["b", "a", { "i": 1 }], ["b", "g", { "i": 1 }], ["c", "d", { "i": 1 }], ["c", "b", { "i": 1 }], ["c", "g", { "i": 1 }], ["d", "e", { "i": 1 }], ["d", "c", { "i": 1 }], ["d", "g", { "i": 1 }], ["e", "f", { "i": 1 }], ["e", "d", { "i": 1 }], ["e", "g", { "i": 1 }], ["f", "a", { "i": 1 }], ["f", "e", { "i": 1 }], ["f", "g", { "i": 1 }], ["g", "a", { "i": 1 }], ["g", "b", { "i": 1 }], ["g", "c", { "i": 1 }], ["g", "d", { "i": 1 }], ["g", "e", { "i": 1 }], ["g", "f", { "i": 1 }], ["a", "b", { "i": 2 }], ["a", "f", { "i": 2 }], ["a", "g", { "i": 2 }], ["b", "c", { "i": 2 }], ["b", "a", { "i": 2 }], ["b", "g", { "i": 2 }], ["c", "d", { "i": 2 }], ["c", "b", { "i": 2 }], ["c", "g", { "i": 2 }], ["d", "e", { "i": 2 }], ["d", "c", { "i": 2 }], ["d", "g", { "i": 2 }], ["e", "f", { "i": 2 }], ["e", "d", { "i": 2 }], ["e", "g", { "i": 2 }], ["f", "a", { "i": 2 }], ["f", "e", { "i": 2 }], ["f", "g", { "i": 2 }], ["g", "a", { "i": 2 }], ["g", "b", { "i": 2 }], ["g", "c", { "i": 2 }], ["g", "d", { "i": 2 }], ["g", "e", { "i": 2 }], ["g", "f", { "i": 2 }], ["a", "b", { "i": 3 }], ["a", "f", { "i": 3 }], ["a", "g", { "i": 3 }], ["b", "c", { "i": 3 }], ["b", "a", { "i": 3 }], ["b", "g", { "i": 3 }], ["c", "d", { "i": 3 }], ["c", "b", { "i": 3 }], ["c", "g", { "i": 3 }], ["d", "e", { "i": 3 }], ["d", "c", { "i": 3 }], ["d", "g", { "i": 3 }], ["e", "f", { "i": 3 }], ["e", "d", { "i": 3 }], ["e", "g", { "i": 3 }], ["f", "a", { "i": 3 }], ["f", "e", { "i": 3 }], ["f", "g", { "i": 3 }], ["g", "a", { "i": 3 }], ["g", "b", { "i": 3 }], ["g", "c", { "i": 3 }], ["g", "d", { "i": 3 }], ["g", "e", { "i": 3 }], ["g", "f", { "i": 3 }]];
 var cell3 = cell4.filter(function (el) { return el[2].i < 3; });
 var cell2 = cell4.filter(function (el) { return el[2].i < 2; });
@@ -72024,7 +72064,7 @@ var flake1 = [["bf", "ad"], ["ad", "bf"], ["bf", "ae"], ["ae", "bf"], ["be", "bf
 var wing1 = [["cf", "cd"], ["cd", "cf"], ["cf", "ce"], ["ce", "cf"], ["dd", "cf"], ["cf", "dd"], ["ce", "dd"], ["dd", "ce"], ["ac", "dd"], ["dd", "ac"], ["de", "dd"], ["dd", "de"], ["de", "ac"], ["ac", "de"], ["ab", "ac"], ["ac", "ab"], ["eb", "ec"], ["ec", "eb"], ["cb", "ec"], ["ec", "cb"], ["ca", "ec"], ["ec", "ca"], ["ca", "cb"], ["cb", "ca"], ["dc", "cb"], ["cb", "dc"], ["db", "cb"], ["cb", "db"], ["db", "dc"], ["dc", "db"], ["dg", "dc"], ["dc", "dg"], ["ce", "de"], ["de", "ce"], ["ca", "db"], ["db", "ca"], ["ca", "eb"], ["eb", "ea"], ["ea", "cd"], ["cd", "ce"], ["ce", "da"], ["da", "ca"], ["ca", "da"], ["da", "ce"], ["ce", "cd"], ["cd", "ea"], ["ea", "eb"], ["eb", "ca"], ["cg", "ca"], ["ca", "cg"], ["cg", "eb"], ["eb", "cg"], ["cg", "ea"], ["ea", "cg"], ["cg", "cd"], ["cd", "cg"], ["cg", "ce"], ["ce", "cg"], ["cg", "da"], ["da", "cg"], ["dg", "db"], ["db", "da"], ["da", "de"], ["de", "ab"], ["ab", "bc"], ["bc", "dg"], ["dg", "bc"], ["bc", "ab"], ["ab", "de"], ["de", "da"], ["da", "db"], ["db", "dg"], ["df", "dg"], ["dg", "df"], ["df", "db"], ["db", "df"], ["df", "da"], ["da", "df"], ["df", "de"], ["de", "df"], ["df", "ab"], ["ab", "df"], ["df", "bc"], ["bc", "df"], ["bf", "ad"], ["ad", "bf"], ["bf", "ae"], ["ae", "bf"], ["be", "bf"], ["bf", "be"], ["ae", "be"], ["be", "ae"], ["bd", "be"], ["be", "bd"], ["d", "be"], ["be", "d"], ["d", "bd"], ["bd", "d"], ["e", "bd"], ["bd", "e"], ["ab", "bc"], ["bc", "ab"], ["bb", "bc"], ["bc", "bb"], ["aa", "bc"], ["bc", "aa"], ["aa", "bb"], ["bb", "aa"], ["ba", "bb"], ["bb", "ba"], ["b", "bb"], ["bb", "b"], ["b", "ba"], ["ba", "b"], ["a", "ba"], ["ba", "a"], ["ae", "d"], ["d", "ae"], ["aa", "b"], ["b", "aa"], ["aa", "ab"], ["ab", "ac"], ["ac", "ad"], ["ad", "ae"], ["ae", "c"], ["c", "aa"], ["aa", "c"], ["c", "ae"], ["ae", "ad"], ["ad", "ac"], ["ac", "ab"], ["ab", "aa"], ["ag", "aa"], ["aa", "ag"], ["ag", "ab"], ["ab", "ag"], ["ag", "ac"], ["ac", "ag"], ["ag", "ad"], ["ad", "ag"], ["ag", "ae"], ["ae", "ag"], ["ag", "c"], ["c", "ag"], ["a", "b"], ["b", "c"], ["c", "d"], ["d", "e"], ["e", "f"], ["f", "a"], ["a", "f"], ["f", "e"], ["e", "d"], ["d", "c"], ["c", "b"], ["b", "a"], ["g", "a"], ["a", "g"], ["g", "b"], ["b", "g"], ["g", "c"], ["c", "g"], ["g", "d"], ["d", "g"], ["g", "e"], ["e", "g"], ["g", "f"], ["f", "g"]];
 var shield1 = [["ef:dc", "fd", { "i": 0 }], ["fd", "ef:dc", { "i": 0 }], ["ef:dc", "fe", { "i": 0 }], ["fe", "ef:dc", { "i": 0 }], ["ee:dg", "ef:dc", { "i": 0 }], ["ef:dc", "ee:dg", { "i": 0 }], ["fe", "ee:dg", { "i": 0 }], ["ee:dg", "fe", { "i": 0 }], ["ed:bc", "ee:dg", { "i": 0 }], ["ee:dg", "ed:bc", { "i": 0 }], ["gd", "ee:dg", { "i": 0 }], ["ee:dg", "gd", { "i": 0 }], ["gd", "ed:bc", { "i": 0 }], ["ed:bc", "gd", { "i": 0 }], ["ge:bb", "ed:bc", { "i": 0 }], ["ed:bc", "ge:bb", { "i": 0 }], ["dd", "ac", { "i": 0 }], ["ac", "dd", { "i": 0 }], ["ad", "ac", { "i": 0 }], ["ac", "ad", { "i": 0 }], ["fa", "ac", { "i": 0 }], ["ac", "fa", { "i": 0 }], ["fa", "ad", { "i": 0 }], ["ad", "fa", { "i": 0 }], ["bf", "ad", { "i": 0 }], ["ad", "bf", { "i": 0 }], ["gb", "ad", { "i": 0 }], ["ad", "gb", { "i": 0 }], ["gb", "bf", { "i": 0 }], ["bf", "gb", { "i": 0 }], ["ga", "bf", { "i": 0 }], ["bf", "ga", { "i": 0 }], ["fe", "gd", { "i": 0 }], ["gd", "fe", { "i": 0 }], ["fa", "gb", { "i": 0 }], ["gb", "fa", { "i": 0 }], ["fa", "dd", { "i": 0 }], ["dd", "cf", { "i": 0 }], ["cf", "fd", { "i": 0 }], ["fd", "fe", { "i": 0 }], ["fe", "ff", { "i": 0 }], ["ff", "fa", { "i": 0 }], ["fa", "ff", { "i": 0 }], ["ff", "fe", { "i": 0 }], ["fe", "fd", { "i": 0 }], ["fd", "cf", { "i": 0 }], ["cf", "dd", { "i": 0 }], ["dd", "fa", { "i": 0 }], ["fg", "fa", { "i": 0 }], ["fa", "fg", { "i": 0 }], ["fg", "dd", { "i": 0 }], ["dd", "fg", { "i": 0 }], ["fg", "cf", { "i": 0 }], ["cf", "fg", { "i": 0 }], ["fg", "fd", { "i": 0 }], ["fd", "fg", { "i": 0 }], ["fg", "fe", { "i": 0 }], ["fe", "fg", { "i": 0 }], ["fg", "ff", { "i": 0 }], ["ff", "fg", { "i": 0 }], ["ga", "gb", { "i": 0 }], ["gb", "ff", { "i": 0 }], ["ff", "gd", { "i": 0 }], ["gd", "ge:bb", { "i": 0 }], ["ge:bb", "gf:ba", { "i": 0 }], ["gf:ba", "ga", { "i": 0 }], ["ga", "gf:ba", { "i": 0 }], ["gf:ba", "ge:bb", { "i": 0 }], ["ge:bb", "gd", { "i": 0 }], ["gd", "ff", { "i": 0 }], ["ff", "gb", { "i": 0 }], ["gb", "ga", { "i": 0 }], ["gg", "ga", { "i": 0 }], ["ga", "gg", { "i": 0 }], ["gg", "gb", { "i": 0 }], ["gb", "gg", { "i": 0 }], ["gg", "ff", { "i": 0 }], ["ff", "gg", { "i": 0 }], ["gg", "gd", { "i": 0 }], ["gd", "gg", { "i": 0 }], ["gg", "ge:bb", { "i": 0 }], ["ge:bb", "gg", { "i": 0 }], ["gg", "gf:ba", { "i": 0 }], ["gf:ba", "gg", { "i": 0 }], ["cf", "cd", { "i": 0 }], ["cd", "cf", { "i": 0 }], ["cf", "ce", { "i": 0 }], ["ce", "cf", { "i": 0 }], ["dd", "cf", { "i": 0 }], ["cf", "dd", { "i": 0 }], ["ce", "dd", { "i": 0 }], ["dd", "ce", { "i": 0 }], ["ac", "dd", { "i": 0 }], ["dd", "ac", { "i": 0 }], ["de", "dd", { "i": 0 }], ["dd", "de", { "i": 0 }], ["de", "ac", { "i": 0 }], ["ac", "de", { "i": 0 }], ["ab", "ac", { "i": 0 }], ["ac", "ab", { "i": 0 }], ["eb", "ec", { "i": 0 }], ["ec", "eb", { "i": 0 }], ["cb", "ec", { "i": 0 }], ["ec", "cb", { "i": 0 }], ["ca", "ec", { "i": 0 }], ["ec", "ca", { "i": 0 }], ["ca", "cb", { "i": 0 }], ["cb", "ca", { "i": 0 }], ["dc", "cb", { "i": 0 }], ["cb", "dc", { "i": 0 }], ["db", "cb", { "i": 0 }], ["cb", "db", { "i": 0 }], ["db", "dc", { "i": 0 }], ["dc", "db", { "i": 0 }], ["dg", "dc", { "i": 0 }], ["dc", "dg", { "i": 0 }], ["ce", "de", { "i": 0 }], ["de", "ce", { "i": 0 }], ["ca", "db", { "i": 0 }], ["db", "ca", { "i": 0 }], ["ca", "eb", { "i": 0 }], ["eb", "ea", { "i": 0 }], ["ea", "cd", { "i": 0 }], ["cd", "ce", { "i": 0 }], ["ce", "da", { "i": 0 }], ["da", "ca", { "i": 0 }], ["ca", "da", { "i": 0 }], ["da", "ce", { "i": 0 }], ["ce", "cd", { "i": 0 }], ["cd", "ea", { "i": 0 }], ["ea", "eb", { "i": 0 }], ["eb", "ca", { "i": 0 }], ["cg", "ca", { "i": 0 }], ["ca", "cg", { "i": 0 }], ["cg", "eb", { "i": 0 }], ["eb", "cg", { "i": 0 }], ["cg", "ea", { "i": 0 }], ["ea", "cg", { "i": 0 }], ["cg", "cd", { "i": 0 }], ["cd", "cg", { "i": 0 }], ["cg", "ce", { "i": 0 }], ["ce", "cg", { "i": 0 }], ["cg", "da", { "i": 0 }], ["da", "cg", { "i": 0 }], ["dg", "db", { "i": 0 }], ["db", "da", { "i": 0 }], ["da", "de", { "i": 0 }], ["de", "ab", { "i": 0 }], ["ab", "bc", { "i": 0 }], ["bc", "dg", { "i": 0 }], ["dg", "bc", { "i": 0 }], ["bc", "ab", { "i": 0 }], ["ab", "de", { "i": 0 }], ["de", "da", { "i": 0 }], ["da", "db", { "i": 0 }], ["db", "dg", { "i": 0 }], ["df", "dg", { "i": 0 }], ["dg", "df", { "i": 0 }], ["df", "db", { "i": 0 }], ["db", "df", { "i": 0 }], ["df", "da", { "i": 0 }], ["da", "df", { "i": 0 }], ["df", "de", { "i": 0 }], ["de", "df", { "i": 0 }], ["df", "ab", { "i": 0 }], ["ab", "df", { "i": 0 }], ["df", "bc", { "i": 0 }], ["bc", "df", { "i": 0 }], ["bf", "ad", { "i": 0 }], ["ad", "bf", { "i": 0 }], ["bf", "ae", { "i": 0 }], ["ae", "bf", { "i": 0 }], ["be", "bf", { "i": 0 }], ["bf", "be", { "i": 0 }], ["ae", "be", { "i": 0 }], ["be", "ae", { "i": 0 }], ["bd", "be", { "i": 0 }], ["be", "bd", { "i": 0 }], ["d", "be", { "i": 0 }], ["be", "d", { "i": 0 }], ["d", "bd", { "i": 0 }], ["bd", "d", { "i": 0 }], ["e", "bd", { "i": 0 }], ["bd", "e", { "i": 0 }], ["ab", "bc", { "i": 0 }], ["bc", "ab", { "i": 0 }], ["bb", "bc", { "i": 0 }], ["bc", "bb", { "i": 0 }], ["aa", "bc", { "i": 0 }], ["bc", "aa", { "i": 0 }], ["aa", "bb", { "i": 0 }], ["bb", "aa", { "i": 0 }], ["ba", "bb", { "i": 0 }], ["bb", "ba", { "i": 0 }], ["b", "bb", { "i": 0 }], ["bb", "b", { "i": 0 }], ["b", "ba", { "i": 0 }], ["ba", "b", { "i": 0 }], ["a", "ba", { "i": 0 }], ["ba", "a", { "i": 0 }], ["ae", "d", { "i": 0 }], ["d", "ae", { "i": 0 }], ["aa", "b", { "i": 0 }], ["b", "aa", { "i": 0 }], ["aa", "ab", { "i": 0 }], ["ab", "ac", { "i": 0 }], ["ac", "ad", { "i": 0 }], ["ad", "ae", { "i": 0 }], ["ae", "c", { "i": 0 }], ["c", "aa", { "i": 0 }], ["aa", "c", { "i": 0 }], ["c", "ae", { "i": 0 }], ["ae", "ad", { "i": 0 }], ["ad", "ac", { "i": 0 }], ["ac", "ab", { "i": 0 }], ["ab", "aa", { "i": 0 }], ["ag", "aa", { "i": 0 }], ["aa", "ag", { "i": 0 }], ["ag", "ab", { "i": 0 }], ["ab", "ag", { "i": 0 }], ["ag", "ac", { "i": 0 }], ["ac", "ag", { "i": 0 }], ["ag", "ad", { "i": 0 }], ["ad", "ag", { "i": 0 }], ["ag", "ae", { "i": 0 }], ["ae", "ag", { "i": 0 }], ["ag", "c", { "i": 0 }], ["c", "ag", { "i": 0 }], ["a", "b", { "i": 0 }], ["b", "c", { "i": 0 }], ["c", "d", { "i": 0 }], ["d", "e", { "i": 0 }], ["e", "f", { "i": 0 }], ["f", "a", { "i": 0 }], ["a", "f", { "i": 0 }], ["f", "e", { "i": 0 }], ["e", "d", { "i": 0 }], ["d", "c", { "i": 0 }], ["c", "b", { "i": 0 }], ["b", "a", { "i": 0 }], ["g", "a", { "i": 0 }], ["a", "g", { "i": 0 }], ["g", "b", { "i": 0 }], ["b", "g", { "i": 0 }], ["g", "c", { "i": 0 }], ["c", "g", { "i": 0 }], ["g", "d", { "i": 0 }], ["d", "g", { "i": 0 }], ["g", "e", { "i": 0 }], ["e", "g", { "i": 0 }], ["g", "f", { "i": 0 }], ["f", "g", { "i": 0 }]];
 var monster = [["b", "c"], ["c", "b"], ["d", "e"], ["e", "d"], ["f", "g"], ["g", "f"], ["f", "h"], ["h", "f"], ["i", "f"], ["f", "i"], ["h", "i"], ["i", "h"], ["j", "i"], ["i", "j"], ["k", "i"], ["i", "k"], ["k", "j"], ["j", "k"], ["l", "j"], ["j", "l"], ["m", "n"], ["n", "m"], ["o", "n"], ["n", "o"], ["p", "n"], ["n", "p"], ["p", "o"], ["o", "p"], ["q", "o"], ["o", "q"], ["r", "o"], ["o", "r"], ["r", "q"], ["q", "r"], ["s", "q"], ["q", "s"], ["h", "k"], ["k", "h"], ["p", "r"], ["r", "p"], ["p", "m"], ["m", "t"], ["t", "g"], ["g", "h"], ["h", "u"], ["u", "p"], ["p", "u"], ["u", "h"], ["h", "g"], ["g", "t"], ["t", "m"], ["m", "p"], ["v", "p"], ["p", "v"], ["v", "m"], ["m", "v"], ["v", "t"], ["t", "v"], ["v", "g"], ["g", "v"], ["v", "h"], ["h", "v"], ["v", "u"], ["u", "v"], ["s", "r"], ["r", "u"], ["u", "k"], ["k", "l"], ["l", "w"], ["w", "s"], ["s", "w"], ["w", "l"], ["l", "k"], ["k", "u"], ["u", "r"], ["r", "s"], ["x", "s"], ["s", "x"], ["x", "r"], ["r", "x"], ["x", "u"], ["u", "x"], ["x", "k"], ["k", "x"], ["x", "l"], ["l", "x"], ["x", "w"], ["w", "x"], ["t", "y"], ["y", "t"], ["t", "z"], ["z", "t"], ["m", "t"], ["t", "m"], ["z", "m"], ["m", "z"], ["n", "m"], ["m", "n"], ["A", "m"], ["m", "A"], ["A", "n"], ["n", "A"], ["B", "n"], ["n", "B"], ["C", "D"], ["D", "C"], ["E", "D"], ["D", "E"], ["F", "D"], ["D", "F"], ["F", "E"], ["E", "F"], ["G", "E"], ["E", "G"], ["H", "E"], ["E", "H"], ["H", "G"], ["G", "H"], ["I", "G"], ["G", "I"], ["z", "A"], ["A", "z"], ["F", "H"], ["H", "F"], ["F", "C"], ["C", "J"], ["J", "y"], ["y", "z"], ["z", "K"], ["K", "F"], ["F", "K"], ["K", "z"], ["z", "y"], ["y", "J"], ["J", "C"], ["C", "F"], ["L", "F"], ["F", "L"], ["L", "C"], ["C", "L"], ["L", "J"], ["J", "L"], ["L", "y"], ["y", "L"], ["L", "z"], ["z", "L"], ["L", "K"], ["K", "L"], ["I", "H"], ["H", "K"], ["K", "A"], ["A", "B"], ["B", "M"], ["M", "I"], ["I", "M"], ["M", "B"], ["B", "A"], ["A", "K"], ["K", "H"], ["H", "I"], ["N", "I"], ["I", "N"], ["N", "H"], ["H", "N"], ["N", "K"], ["K", "N"], ["N", "A"], ["A", "N"], ["N", "B"], ["B", "N"], ["N", "M"], ["M", "N"], ["q", "o"], ["o", "q"], ["q", "O"], ["O", "q"], ["P", "q"], ["q", "P"], ["O", "P"], ["P", "O"], ["Q", "P"], ["P", "Q"], ["R", "P"], ["P", "R"], ["R", "Q"], ["Q", "R"], ["S", "Q"], ["Q", "S"], ["B", "M"], ["M", "B"], ["T", "M"], ["M", "T"], ["U", "M"], ["M", "U"], ["U", "T"], ["T", "U"], ["V", "T"], ["T", "V"], ["W", "T"], ["T", "W"], ["W", "V"], ["V", "W"], ["X", "V"], ["V", "X"], ["O", "R"], ["R", "O"], ["U", "W"], ["W", "U"], ["U", "B"], ["B", "n"], ["n", "o"], ["o", "O"], ["O", "Y"], ["Y", "U"], ["U", "Y"], ["Y", "O"], ["O", "o"], ["o", "n"], ["n", "B"], ["B", "U"], ["Z", "U"], ["U", "Z"], ["Z", "B"], ["B", "Z"], ["Z", "n"], ["n", "Z"], ["Z", "o"], ["o", "Z"], ["Z", "O"], ["O", "Z"], ["Z", "Y"], ["Y", "Z"], ["X", "W"], ["W", "Y"], ["Y", "R"], ["R", "S"], ["S", "aa"], ["aa", "S"], ["S", "R"], ["R", "Y"], ["Y", "W"], ["W", "X"], ["d", "X"], ["X", "d"], ["d", "W"], ["W", "d"], ["d", "Y"], ["Y", "d"], ["d", "R"], ["R", "d"], ["d", "S"], ["S", "d"], ["Q", "S"], ["S", "Q"], ["Q", "aa"], ["aa", "Q"], ["ab", "Q"], ["Q", "ab"], ["aa", "ab"], ["ab", "aa"], ["ac", "ab"], ["ab", "ac"], ["ad", "ab"], ["ab", "ad"], ["ad", "ac"], ["ac", "ad"], ["ae", "ac"], ["ac", "ae"], ["af", "ag"], ["ag", "af"], ["ah", "ag"], ["ag", "ah"], ["ai", "ag"], ["ag", "ai"], ["ai", "ah"], ["ah", "ai"], ["aj", "ah"], ["ah", "aj"], ["ak", "ah"], ["ah", "ak"], ["ak", "aj"], ["aj", "ak"], ["al", "aj"], ["aj", "al"], ["aa", "ad"], ["ad", "aa"], ["ai", "ak"], ["ak", "ai"], ["ai", "af"], ["af", "e"], ["e", "S"], ["S", "aa"], ["aa", "am"], ["am", "ai"], ["ai", "am"], ["am", "aa"], ["aa", "S"], ["S", "e"], ["e", "af"], ["af", "ai"], ["an", "ai"], ["ai", "an"], ["an", "af"], ["af", "an"], ["an", "e"], ["e", "an"], ["an", "S"], ["S", "an"], ["an", "aa"], ["aa", "an"], ["an", "am"], ["am", "an"], ["al", "ak"], ["ak", "am"], ["am", "ad"], ["ad", "ae"], ["ae", "ao"], ["ao", "al"], ["al", "ao"], ["ao", "ae"], ["ae", "ad"], ["ad", "am"], ["am", "ak"], ["ak", "al"], ["ap", "al"], ["al", "ap"], ["ap", "ak"], ["ak", "ap"], ["ap", "am"], ["am", "ap"], ["ap", "ad"], ["ad", "ap"], ["ap", "ae"], ["ae", "ap"], ["ap", "ao"], ["ao", "ap"], ["e", "X"], ["X", "e"], ["e", "aq"], ["aq", "e"], ["af", "e"], ["e", "af"], ["aq", "af"], ["af", "aq"], ["ag", "af"], ["af", "ag"], ["ar", "af"], ["af", "ar"], ["ar", "ag"], ["ag", "ar"], ["as", "ag"], ["ag", "as"], ["at", "au"], ["au", "at"], ["av", "au"], ["au", "av"], ["aw", "au"], ["au", "aw"], ["aw", "av"], ["av", "aw"], ["ax", "av"], ["av", "ax"], ["ay", "av"], ["av", "ay"], ["ay", "ax"], ["ax", "ay"], ["az", "ax"], ["ax", "az"], ["aq", "ar"], ["ar", "aq"], ["aw", "ay"], ["ay", "aw"], ["aw", "at"], ["at", "V"], ["V", "X"], ["X", "aq"], ["aq", "aA"], ["aA", "aw"], ["aw", "aA"], ["aA", "aq"], ["aq", "X"], ["X", "V"], ["V", "at"], ["at", "aw"], ["aB", "aw"], ["aw", "aB"], ["aB", "at"], ["at", "aB"], ["aB", "V"], ["V", "aB"], ["aB", "X"], ["X", "aB"], ["aB", "aq"], ["aq", "aB"], ["aB", "aA"], ["aA", "aB"], ["az", "ay"], ["ay", "aA"], ["aA", "ar"], ["ar", "as"], ["as", "aC"], ["aC", "az"], ["az", "aC"], ["aC", "as"], ["as", "ar"], ["ar", "aA"], ["aA", "ay"], ["ay", "az"], ["aD", "az"], ["az", "aD"], ["aD", "ay"], ["ay", "aD"], ["aD", "aA"], ["aA", "aD"], ["aD", "ar"], ["ar", "aD"], ["aD", "as"], ["as", "aD"], ["aD", "aC"], ["aC", "aD"], ["aj", "ah"], ["ah", "aj"], ["aj", "aE"], ["aE", "aj"], ["aF", "aj"], ["aj", "aF"], ["aE", "aF"], ["aF", "aE"], ["aG", "aF"], ["aF", "aG"], ["aH", "aF"], ["aF", "aH"], ["aH", "aG"], ["aG", "aH"], ["aI", "aG"], ["aG", "aI"], ["as", "aC"], ["aC", "as"], ["aJ", "aC"], ["aC", "aJ"], ["aK", "aC"], ["aC", "aK"], ["aK", "aJ"], ["aJ", "aK"], ["aL", "aJ"], ["aJ", "aL"], ["aM", "aJ"], ["aJ", "aM"], ["aM", "aL"], ["aL", "aM"], ["aN", "aL"], ["aL", "aN"], ["aE", "aH"], ["aH", "aE"], ["aK", "aM"], ["aM", "aK"], ["aK", "as"], ["as", "ag"], ["ag", "ah"], ["ah", "aE"], ["aE", "aO"], ["aO", "aK"], ["aK", "aO"], ["aO", "aE"], ["aE", "ah"], ["ah", "ag"], ["ag", "as"], ["as", "aK"], ["aP", "aK"], ["aK", "aP"], ["aP", "as"], ["as", "aP"], ["aP", "ag"], ["ag", "aP"], ["aP", "ah"], ["ah", "aP"], ["aP", "aE"], ["aE", "aP"], ["aP", "aO"], ["aO", "aP"], ["aN", "aM"], ["aM", "aO"], ["aO", "aH"], ["aH", "aI"], ["aI", "aQ"], ["aQ", "aN"], ["aN", "aQ"], ["aQ", "aI"], ["aI", "aH"], ["aH", "aO"], ["aO", "aM"], ["aM", "aN"], ["aR", "aN"], ["aN", "aR"], ["aR", "aM"], ["aM", "aR"], ["aR", "aO"], ["aO", "aR"], ["aR", "aH"], ["aH", "aR"], ["aR", "aI"], ["aI", "aR"], ["aR", "aQ"], ["aQ", "aR"], ["aG", "aI"], ["aI", "aG"], ["aG", "aS"], ["aS", "aG"], ["aT", "aG"], ["aG", "aT"], ["aS", "aT"], ["aT", "aS"], ["aU", "aT"], ["aT", "aU"], ["aV", "aT"], ["aT", "aV"], ["aV", "aU"], ["aU", "aV"], ["aW", "aU"], ["aU", "aW"], ["aX", "aY"], ["aY", "aX"], ["aZ", "aY"], ["aY", "aZ"], ["ba", "aY"], ["aY", "ba"], ["ba", "aZ"], ["aZ", "ba"], ["bb", "aZ"], ["aZ", "bb"], ["bc", "aZ"], ["aZ", "bc"], ["bc", "bb"], ["bb", "bc"], ["bd", "bb"], ["bb", "bd"], ["aS", "aV"], ["aV", "aS"], ["ba", "bc"], ["bc", "ba"], ["ba", "aX"], ["aX", "aQ"], ["aQ", "aI"], ["aI", "aS"], ["aS", "be"], ["be", "ba"], ["ba", "be"], ["be", "aS"], ["aS", "aI"], ["aI", "aQ"], ["aQ", "aX"], ["aX", "ba"], ["bf", "ba"], ["ba", "bf"], ["bf", "aX"], ["aX", "bf"], ["bf", "aQ"], ["aQ", "bf"], ["bf", "aI"], ["aI", "bf"], ["bf", "aS"], ["aS", "bf"], ["bf", "be"], ["be", "bf"], ["bd", "bc"], ["bc", "be"], ["be", "aV"], ["aV", "aW"], ["aW", "bg"], ["bg", "bd"], ["bd", "bg"], ["bg", "aW"], ["aW", "aV"], ["aV", "be"], ["be", "bc"], ["bc", "bd"], ["bh", "bd"], ["bd", "bh"], ["bh", "bc"], ["bc", "bh"], ["bh", "be"], ["be", "bh"], ["bh", "aV"], ["aV", "bh"], ["bh", "aW"], ["aW", "bh"], ["bh", "bg"], ["bg", "bh"], ["aQ", "aN"], ["aN", "aQ"], ["aQ", "bi"], ["bi", "aQ"], ["aX", "aQ"], ["aQ", "aX"], ["bi", "aX"], ["aX", "bi"], ["aY", "aX"], ["aX", "aY"], ["bj", "aX"], ["aX", "bj"], ["bj", "aY"], ["aY", "bj"], ["bk", "aY"], ["aY", "bk"], ["bl", "bm"], ["bm", "bl"], ["bn", "bm"], ["bm", "bn"], ["bo", "bm"], ["bm", "bo"], ["bo", "bn"], ["bn", "bo"], ["bp", "bn"], ["bn", "bp"], ["bq", "bn"], ["bn", "bq"], ["bq", "bp"], ["bp", "bq"], ["br", "bp"], ["bp", "br"], ["bi", "bj"], ["bj", "bi"], ["bo", "bq"], ["bq", "bo"], ["bo", "bl"], ["bl", "aL"], ["aL", "aN"], ["aN", "bi"], ["bi", "bs"], ["bs", "bo"], ["bo", "bs"], ["bs", "bi"], ["bi", "aN"], ["aN", "aL"], ["aL", "bl"], ["bl", "bo"], ["bt", "bo"], ["bo", "bt"], ["bt", "bl"], ["bl", "bt"], ["bt", "aL"], ["aL", "bt"], ["bt", "aN"], ["aN", "bt"], ["bt", "bi"], ["bi", "bt"], ["bt", "bs"], ["bs", "bt"], ["br", "bq"], ["bq", "bs"], ["bs", "bj"], ["bj", "bk"], ["bk", "bu"], ["bu", "br"], ["br", "bu"], ["bu", "bk"], ["bk", "bj"], ["bj", "bs"], ["bs", "bq"], ["bq", "br"], ["bv", "br"], ["br", "bv"], ["bv", "bq"], ["bq", "bv"], ["bv", "bs"], ["bs", "bv"], ["bv", "bj"], ["bj", "bv"], ["bv", "bk"], ["bk", "bv"], ["bv", "bu"], ["bu", "bv"], ["bb", "aZ"], ["aZ", "bb"], ["bb", "bw"], ["bw", "bb"], ["bx", "bb"], ["bb", "bx"], ["bw", "bx"], ["bx", "bw"], ["by", "bx"], ["bx", "by"], ["bz", "bx"], ["bx", "bz"], ["bz", "by"], ["by", "bz"], ["bA", "by"], ["by", "bA"], ["bk", "bu"], ["bu", "bk"], ["bB", "bu"], ["bu", "bB"], ["bC", "bu"], ["bu", "bC"], ["bC", "bB"], ["bB", "bC"], ["bD", "bB"], ["bB", "bD"], ["bE", "bB"], ["bB", "bE"], ["bE", "bD"], ["bD", "bE"], ["bF", "bD"], ["bD", "bF"], ["bw", "bz"], ["bz", "bw"], ["bC", "bE"], ["bE", "bC"], ["bC", "bk"], ["bk", "aY"], ["aY", "aZ"], ["aZ", "bw"], ["bw", "bG"], ["bG", "bC"], ["bC", "bG"], ["bG", "bw"], ["bw", "aZ"], ["aZ", "aY"], ["aY", "bk"], ["bk", "bC"], ["bH", "bC"], ["bC", "bH"], ["bH", "bk"], ["bk", "bH"], ["bH", "aY"], ["aY", "bH"], ["bH", "aZ"], ["aZ", "bH"], ["bH", "bw"], ["bw", "bH"], ["bH", "bG"], ["bG", "bH"], ["bF", "bE"], ["bE", "bG"], ["bG", "bz"], ["bz", "bA"], ["bA", "bI"], ["bI", "bA"], ["bA", "bz"], ["bz", "bG"], ["bG", "bE"], ["bE", "bF"], ["b", "bF"], ["bF", "b"], ["b", "bE"], ["bE", "b"], ["b", "bG"], ["bG", "b"], ["b", "bz"], ["bz", "b"], ["b", "bA"], ["bA", "b"], ["by", "bA"], ["bA", "by"], ["by", "bI"], ["bI", "by"], ["bJ", "by"], ["by", "bJ"], ["bI", "bJ"], ["bJ", "bI"], ["bK", "bJ"], ["bJ", "bK"], ["bL", "bJ"], ["bJ", "bL"], ["bL", "bK"], ["bK", "bL"], ["bM", "bK"], ["bK", "bM"], ["bN", "bO"], ["bO", "bN"], ["bP", "bO"], ["bO", "bP"], ["bQ", "bO"], ["bO", "bQ"], ["bQ", "bP"], ["bP", "bQ"], ["bR", "bP"], ["bP", "bR"], ["bS", "bP"], ["bP", "bS"], ["bS", "bR"], ["bR", "bS"], ["bT", "bR"], ["bR", "bT"], ["bI", "bL"], ["bL", "bI"], ["bQ", "bS"], ["bS", "bQ"], ["bQ", "bN"], ["bN", "c"], ["c", "bA"], ["bA", "bI"], ["bI", "bU"], ["bU", "bQ"], ["bQ", "bU"], ["bU", "bI"], ["bI", "bA"], ["bA", "c"], ["c", "bN"], ["bN", "bQ"], ["bV", "bQ"], ["bQ", "bV"], ["bV", "bN"], ["bN", "bV"], ["bV", "c"], ["c", "bV"], ["bV", "bA"], ["bA", "bV"], ["bV", "bI"], ["bI", "bV"], ["bV", "bU"], ["bU", "bV"], ["bT", "bS"], ["bS", "bU"], ["bU", "bL"], ["bL", "bM"], ["bM", "bW"], ["bW", "bT"], ["bT", "bW"], ["bW", "bM"], ["bM", "bL"], ["bL", "bU"], ["bU", "bS"], ["bS", "bT"], ["bX", "bT"], ["bT", "bX"], ["bX", "bS"], ["bS", "bX"], ["bX", "bU"], ["bU", "bX"], ["bX", "bL"], ["bL", "bX"], ["bX", "bM"], ["bM", "bX"], ["bX", "bW"], ["bW", "bX"], ["c", "bF"], ["bF", "c"], ["c", "bY"], ["bY", "c"], ["bN", "c"], ["c", "bN"], ["bY", "bN"], ["bN", "bY"], ["bO", "bN"], ["bN", "bO"], ["bZ", "bN"], ["bN", "bZ"], ["bZ", "bO"], ["bO", "bZ"], ["ca", "bO"], ["bO", "ca"], ["cb", "cc"], ["cc", "cb"], ["cd", "cc"], ["cc", "cd"], ["ce", "cc"], ["cc", "ce"], ["ce", "cd"], ["cd", "ce"], ["cf", "cd"], ["cd", "cf"], ["cg", "cd"], ["cd", "cg"], ["cg", "cf"], ["cf", "cg"], ["ch", "cf"], ["cf", "ch"], ["bY", "bZ"], ["bZ", "bY"], ["ce", "cg"], ["cg", "ce"], ["ce", "cb"], ["cb", "bD"], ["bD", "bF"], ["bF", "bY"], ["bY", "ci"], ["ci", "ce"], ["ce", "ci"], ["ci", "bY"], ["bY", "bF"], ["bF", "bD"], ["bD", "cb"], ["cb", "ce"], ["cj", "ce"], ["ce", "cj"], ["cj", "cb"], ["cb", "cj"], ["cj", "bD"], ["bD", "cj"], ["cj", "bF"], ["bF", "cj"], ["cj", "bY"], ["bY", "cj"], ["cj", "ci"], ["ci", "cj"], ["ch", "cg"], ["cg", "ci"], ["ci", "bZ"], ["bZ", "ca"], ["ca", "ck"], ["ck", "ch"], ["ch", "ck"], ["ck", "ca"], ["ca", "bZ"], ["bZ", "ci"], ["ci", "cg"], ["cg", "ch"], ["cl", "ch"], ["ch", "cl"], ["cl", "cg"], ["cg", "cl"], ["cl", "ci"], ["ci", "cl"], ["cl", "bZ"], ["bZ", "cl"], ["cl", "ca"], ["ca", "cl"], ["cl", "ck"], ["ck", "cl"], ["bR", "bP"], ["bP", "bR"], ["bR", "cm"], ["cm", "bR"], ["cn", "bR"], ["bR", "cn"], ["cm", "cn"], ["cn", "cm"], ["co", "cn"], ["cn", "co"], ["cp", "cn"], ["cn", "cp"], ["cp", "co"], ["co", "cp"], ["cq", "co"], ["co", "cq"], ["ca", "ck"], ["ck", "ca"], ["cr", "ck"], ["ck", "cr"], ["cs", "ck"], ["ck", "cs"], ["cs", "cr"], ["cr", "cs"], ["ct", "cr"], ["cr", "ct"], ["cu", "cr"], ["cr", "cu"], ["cu", "ct"], ["ct", "cu"], ["cv", "ct"], ["ct", "cv"], ["cm", "cp"], ["cp", "cm"], ["cs", "cu"], ["cu", "cs"], ["cs", "ca"], ["ca", "bO"], ["bO", "bP"], ["bP", "cm"], ["cm", "cw"], ["cw", "cs"], ["cs", "cw"], ["cw", "cm"], ["cm", "bP"], ["bP", "bO"], ["bO", "ca"], ["ca", "cs"], ["cx", "cs"], ["cs", "cx"], ["cx", "ca"], ["ca", "cx"], ["cx", "bO"], ["bO", "cx"], ["cx", "bP"], ["bP", "cx"], ["cx", "cm"], ["cm", "cx"], ["cx", "cw"], ["cw", "cx"], ["cv", "cu"], ["cu", "cw"], ["cw", "cp"], ["cp", "cq"], ["cq", "cy"], ["cy", "cv"], ["cv", "cy"], ["cy", "cq"], ["cq", "cp"], ["cp", "cw"], ["cw", "cu"], ["cu", "cv"], ["cz", "cv"], ["cv", "cz"], ["cz", "cu"], ["cu", "cz"], ["cz", "cw"], ["cw", "cz"], ["cz", "cp"], ["cp", "cz"], ["cz", "cq"], ["cq", "cz"], ["cz", "cy"], ["cy", "cz"]];
-var nodes = addMetadata(hexGraph(8, 8));
+var nodes = randomGraph(40, 200); //addMetadata(hexGraph(9,9, true))
 
 
 
@@ -72098,6 +72138,10 @@ If yϵρO > 0 and ρO + yϵρO < zO
 
 */
 
+// declare interface XArray {
+//     shuffle() : Array<any>;
+// }
+// XArray.prototype.shuffle = function(this: any) { return shuffle(this) }
 var HyperGridValidationException = /** @class */ (function (_super) {
     __extends(HyperGridValidationException, _super);
     function HyperGridValidationException(msg) {
@@ -72200,8 +72244,8 @@ var HyperGrid = /** @class */ (function () {
         else {
             var self_1 = this, opts_1 = n.length > 2 ? n[2] : {}, pnode = function (n) { return n.split('|')[0]; }, punions = function (n) { return n.split('|').filter(function (e, i) { return i > 0; }); };
             var outlist_1 = [
-                this.hnodes.get(n[0]),
-                this.hnodes.get(n[1])
+                this.hnodes.get(pnode(n[0])),
+                this.hnodes.get(pnode(n[1]))
             ];
             outlist_1[0] = outlist_1[0] ? outlist_1[0] : new HyperGridNode(pnode(n[0]), opts_1);
             outlist_1[1] = outlist_1[1] ? outlist_1[1] : new HyperGridNode(pnode(n[1]), opts_1);
@@ -72362,7 +72406,7 @@ var HyperGridNode = /** @class */ (function () {
             return this._value;
         },
         set: function (v) {
-            validate(this.value + v <= this.capacity && v > 0, "node " + this.id + " capacity out of bounds: " + v);
+            validate(this.value + v <= this.capacity && v > 0, "node " + this.id + " capacity " + this.capacity + " would be out of bounds: " + (this.value + v));
             this._value = v;
         },
         enumerable: true,
@@ -72377,12 +72421,12 @@ var HyperGridNode = /** @class */ (function () {
     });
     HyperGridNode.prototype.inc = function (v) {
         if (v === void 0) { v = 1; }
-        validate(this.value + v <= this.capacity && v > 0, "node " + this.id + " capacity out of bounds: " + v);
+        validate(this.value + v <= this.capacity && v > 0, "node " + this.id + " capacity " + this.capacity + " would be out of bounds: " + (this.value + v));
         this._value += v;
     };
     HyperGridNode.prototype.dec = function (v) {
         if (v === void 0) { v = 1; }
-        validate(this.value - v >= 0 && v > 0, "node " + this.id + " capacity out of bounds: " + v);
+        validate(this.value - v >= 0 && v > 0, "node " + this.id + " capacity " + this.capacity + " would be out of bounds: " + (this.value - v));
         this._value -= v;
     };
     HyperGridNode.prototype.data = function (k, v) {
@@ -72475,6 +72519,17 @@ var HyperGridNode = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(HyperGridNode.prototype, "inboundUEdges", {
+        get: function () {
+            var out = __spreadArrays(this._inboundEdges);
+            this.unions.forEach(function (a) {
+                return a._outboundEdges.forEach(function (ed) { return out.push(ed); });
+            });
+            return out;
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(HyperGridNode.prototype, "outboundCapacity", {
         get: function () {
             return this.outboundEdges.length;
@@ -72498,9 +72553,12 @@ var HyperGridNode = /** @class */ (function () {
         configurable: true
     });
     HyperGridNode.prototype.evaluate = function () {
+        var shuffle = function (a) {
+            return a; //a.sort(() => Math.random() - 0.5);
+        };
         var self = this;
         var evalOutput = function () {
-            self.outboundEdges.forEach(function (e) {
+            shuffle(self.outboundUEdges).forEach(function (e) {
                 if (e.value === 0 && self.value > 0) {
                     e.inc();
                     self.dec();
@@ -72508,7 +72566,7 @@ var HyperGridNode = /** @class */ (function () {
             });
         };
         var evalInput = function () {
-            self.inboundEdges.forEach(function (e) {
+            shuffle(self.inboundUEdges).forEach(function (e) {
                 if (e.value && self.remainingCapacity > 0) {
                     e.dec();
                     self.inc();
@@ -72628,7 +72686,7 @@ var HyperGridEdge = /** @class */ (function () {
             return this._value;
         },
         set: function (v) {
-            validate(v >= 0 && v <= 1, "node " + this.id + " capacity out of bounds: " + v);
+            validate(v >= 0 && v <= 1, "edge " + this.id + " capacity out of bounds: " + v);
             this._value = v;
         },
         enumerable: true,
@@ -75427,6 +75485,8 @@ var offset = color.offset;
 
 var interact = __webpack_require__(/*! interactjs */ "./node_modules/interactjs/dist/interact.min.js");
 
+var $ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
+
 var fullColor = color.fullColor;
 var getRgb = color.getRgb;
 var g;
@@ -75573,6 +75633,8 @@ var initCanvas = function initCanvas(app) {
   canv.width = '1800';
   canv.height = '1200';
   container.appendChild(canv);
+  var tpl = "\n    <style>\n    canvas {\n        width: 100%;\n        height: 100%;\n    }\n    </style>\n    <div id=\"wrapper\">\n    <canvas id=\"main\" width=\"1800\" height=\"1200\"></canvas>\n    </div>\n    ";
+  $(tpl).appendTo('body');
   app.emerga.initCanvas('main');
   clearCanvas(app);
   var gestureArea = canv;
@@ -76183,6 +76245,7 @@ var OmegaCell = /** @class */ (function () {
     });
     Object.defineProperty(OmegaCell.prototype, "emerga", {
         get: function () { return this._emerga; },
+        set: function (e) { this._emerga = e; },
         enumerable: true,
         configurable: true
     });
@@ -76302,6 +76365,7 @@ var OmegaCellUIClass = /** @class */ (function () {
     };
     OmegaCellUIClass.prototype.reset = function () {
         this._ω.reset();
+        this.initCytograph();
         this.updateStatusLight('success');
     };
     OmegaCellUIClass.prototype.resizeGraphArea = function () {
@@ -76361,7 +76425,29 @@ var OmegaCellUIClass = /** @class */ (function () {
         }
         OmegaCellUI.animateTo(cyElement, elStyle, 90, function () { });
     };
+    OmegaCellUIClass.prototype.initCytograph = function () {
+        var _this = this;
+        var self = this;
+        this.resizeGraphArea();
+        this._cy = this._ω.toCytograph('cy');
+        process.nextTick(function () {
+            _this._cy.on('click', 'node', function (event) {
+                try {
+                    var v = event.target.data('value') + 5;
+                    self.ω.setElementValue(event.target.data('id'), v);
+                }
+                catch (e) { }
+            });
+            _this._cy.on('click', 'edge', function (event) {
+                try {
+                    self.ω.setElementValue(event.target.data('id'), 1);
+                }
+                catch (e) { }
+            });
+        });
+    };
     OmegaCellUIClass.prototype.init = function () {
+        var _this = this;
         var self = this;
         var animTimer;
         jquery__WEBPACK_IMPORTED_MODULE_0___default()('body').empty();
@@ -76378,26 +76464,19 @@ var OmegaCellUIClass = /** @class */ (function () {
             });
             jquery__WEBPACK_IMPORTED_MODULE_0___default()('#btn-reset').click(function () {
                 clearInterval(animTimer);
-                self.reset();
+                self.init();
             });
             jquery__WEBPACK_IMPORTED_MODULE_0___default()('#num-iterations-input').change(function () {
             });
             jquery__WEBPACK_IMPORTED_MODULE_0___default()(window).resize(function () { return self.resizeGraphArea(); });
+            self.createConsole();
             jquery__WEBPACK_IMPORTED_MODULE_0___default()(document).ready(function () {
-                self._cy = self._ω.toCytograph('cy');
-                process.nextTick(function () {
-                    self._cy.on('click', 'node', function (event) {
-                        var v = event.target.data('value') + 5;
-                        self.ω.setElementValue(event.target.data('id'), v);
-                    });
-                    self._cy.on('click', 'edge', function (event) {
-                        self.ω.setElementValue(event.target.data('id'), 1);
-                    });
-                    self.createConsole();
-                    self.resizeGraphArea();
-                });
+                _this.initCytograph();
             });
         });
+        setInterval(function () {
+            var msg = "x iterations, y total system energy";
+        }, 1000);
         //
     };
     OmegaCellUIClass.prototype.run = function () {
