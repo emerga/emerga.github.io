@@ -53445,12 +53445,36 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var dat_gui__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(dat_gui__WEBPACK_IMPORTED_MODULE_4__);
 /* harmony import */ var stats_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! stats.js */ "./node_modules/stats.js/build/stats.min.js");
 /* harmony import */ var stats_js__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(stats_js__WEBPACK_IMPORTED_MODULE_5__);
+var __extends = (undefined && undefined.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 
 
 
 
 
 
+var EWindow = /** @class */ (function (_super) {
+    __extends(EWindow, _super);
+    function EWindow() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    EWindow.prototype.setRunScript = function (s) {
+        this.runScript = s;
+    };
+    return EWindow;
+}(Window));
+var ewindow = window;
 var Emerga = /** @class */ (function () {
     function Emerga() {
         this.dat = dat_gui__WEBPACK_IMPORTED_MODULE_4___default.a;
@@ -53519,9 +53543,12 @@ if (urlParams) {
     });
 }
 var emerga = Emerga.getInstance();
+var runScript = function (s) {
+    emerga.run(_scripts_scripts__WEBPACK_IMPORTED_MODULE_3__["EmergaScripts"].getInstance(s));
+};
+ewindow.runScript = runScript;
 _lib_3rd_party_jquery__WEBPACK_IMPORTED_MODULE_0___default()(document).ready(function () {
-    return emerga
-        .run(_scripts_scripts__WEBPACK_IMPORTED_MODULE_3__["EmergaScripts"].getInstance(script));
+    return runScript(script);
 });
 
 
@@ -76476,6 +76503,7 @@ var OmegaCellUIClass = /** @class */ (function () {
         });
         setInterval(function () {
             var msg = "x iterations, y total system energy";
+            jquery__WEBPACK_IMPORTED_MODULE_0___default()('#control-status-label').html();
         }, 1000);
         //
     };
