@@ -75872,6 +75872,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 var conway = __webpack_require__(/*! ../../lib/conway-state-machine */ "./src/lib/conway-state-machine.js");
 
+var $ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
+
 var singleton;
 
 var GameOfLife = /*#__PURE__*/function () {
@@ -75886,10 +75888,13 @@ var GameOfLife = /*#__PURE__*/function () {
     this._emerga = emerga;
     this.inited = false;
     this._globalCompositeOperation = 'luminosity';
-    this._cellSize = 30;
+    this._gridWidth = 120;
+    this._gridHeight = 80;
+    this._cellSize = $(window).width() / this._gridWidth;
     this._percentAlive = 8;
     this._ui = __webpack_require__(/*! ./ui */ "./src/scripts/game-of-life/ui.js");
     this._scaleFactor = 512;
+    this._complexityRestartThreshold = 0.1;
     this.zcnt = 0;
     this.setupStateMachine();
   }
@@ -75903,8 +75908,10 @@ var GameOfLife = /*#__PURE__*/function () {
      * @param {*} els 
      */
     value: function iterationEmitted(machine, els) {
+      var _this = this;
+
       setTimeout(function () {
-        if (machine.rateOfChange < 0.1) {
+        if (machine.rateOfChange < _this._complexityRestartThreshold) {
           singleton.zcnt++;
 
           if (singleton.zcnt === 10) {
@@ -75939,7 +75946,7 @@ var GameOfLife = /*#__PURE__*/function () {
         smRules = machine.rules;
       }
 
-      singleton.stateMachine = machine = new conway.ConwayStateMachine(120, 80, this._cellSize, this._percentAlive);
+      singleton.stateMachine = machine = new conway.ConwayStateMachine(this._gridWidth, this._gridHeight, this._cellSize, this._percentAlive);
       if (smRules) machine.rules = smRules;
       machine.onEmitIteration = this.iterationEmitted;
       machine.onEmitReset = this.settingsUpdated;
@@ -75967,7 +75974,18 @@ var GameOfLife = /*#__PURE__*/function () {
   }, {
     key: "init",
     value: function init() {
+      var _this2 = this;
+
+      var self = this;
       this.ui.initUI(this);
+      $(window).resize(function () {
+        _this2._cellSize = $(window).width() / _this2._gridWidth;
+        var ctx = self.emerga.context;
+        if (!ctx) return; //ctx.fillColor = '#000'
+
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        self.settingsUpdated();
+      });
     }
     /**
      * 
@@ -76005,6 +76023,14 @@ var GameOfLife = /*#__PURE__*/function () {
       this.settingsUpdated();
     }
   }, {
+    key: "complexityRestartThreshold",
+    get: function get() {
+      return this._complexityRestartThreshold;
+    },
+    set: function set(v) {
+      this._complexityRestartThreshold = v;
+    }
+  }, {
     key: "percentAlive",
     get: function get() {
       return this._percentAlive;
@@ -76024,18 +76050,19 @@ var GameOfLife = /*#__PURE__*/function () {
   }, {
     key: "gridWidth",
     get: function get() {
-      return this.stateMachine.gridWidth;
+      return _.gridWidth;
     },
     set: function set(v) {
-      this.stateMachine.gridWidth = v / this.stateMachine.cellSize;
+      this._gridWidth = v;
+      this.stateMachine.gridWidth = v;
     }
   }, {
     key: "gridHeight",
     get: function get() {
-      return this.stateMachine.gridHeight;
+      return _gridHeight;
     },
     set: function set(v) {
-      this.stateMachine.gridHeight = v / this.stateMachine.cellSize;
+      this.stateMachine.gridHeight = v;
     }
   }, {
     key: "scaleFactor",
@@ -76134,14 +76161,12 @@ var initControls = function initControls(app) {
   foffr.add(rulesObj, 'Off7').onChange(app.settingsUpdated());
   foffr.add(rulesObj, 'Off8').onChange(app.settingsUpdated());
   fr.open();
-  folder = g.addFolder('Rendering'); //folder.add(app, 'cellSize', 1, 100).step(1).onChange(app.settingsUpdated());
-
-  folder.add(app, 'globalCompositeOperation', ['source-over', 'source-in', 'source-out', 'source-stop', 'destination-over', 'destination-in', 'destination-out', 'destination-stop', 'lighter', 'copy', 'xor', 'multiply', 'screen', 'overlay', 'darken', 'lighten', 'color-dodge', 'color-burn', 'hard-light', 'difference', 'exclusion', 'hue', 'saturation', 'color', 'luminosity']).onChange(app.settingsUpdated());
+  fonr.open();
+  foffr.open();
+  folder = g.addFolder('Execution');
+  folder.add(app, 'complexityRestartThreshold', 0, 10).step(0.1).onChange(app.settingsUpdated());
   folder.open();
   g.remember(app);
-  folder = g.addFolder('Scaling');
-  folder.add(app, 'scaleFactor', 1, 8192).onChange(app.settingsUpdated());
-  folder.open();
 };
 /**
  * 
@@ -76156,6 +76181,13 @@ var initUI = function initUI(app) {
   });
   initCanvas(app);
   initControls(app);
+
+  document.resize = function () {
+    var ctx = app.emerga.context;
+    if (!ctx) return;
+    ctx.fillColor = '#000';
+    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  };
 };
 /**
  * 
