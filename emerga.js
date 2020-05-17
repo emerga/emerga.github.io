@@ -53531,7 +53531,7 @@ var Emerga = /** @class */ (function () {
 }());
 var singleton = null;
 var urlParams = new URLSearchParams(window.location.search);
-var script = 'OmegaCell';
+var script = undefined;
 if (urlParams) {
     var params = urlParams.toString().split('&');
     params.forEach(function (param) {
@@ -53548,7 +53548,8 @@ var runScript = function (s) {
 };
 ewindow.runScript = runScript;
 _lib_3rd_party_jquery__WEBPACK_IMPORTED_MODULE_0___default()(document).ready(function () {
-    return runScript(script);
+    if (script !== undefined)
+        runScript(script);
 });
 
 
