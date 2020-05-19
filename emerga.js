@@ -32011,6 +32011,27 @@ dat.utils.common);
 
 /***/ }),
 
+/***/ "./node_modules/honeycomb-grid/dist/honeycomb.esm.min.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/honeycomb-grid/dist/honeycomb.esm.min.js ***!
+  \***************************************************************/
+/*! exports provided: Point, defineGrid, extendHex */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* WEBPACK VAR INJECTION */(function(global) {/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Point", function() { return it; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "defineGrid", function() { return st; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "extendHex", function() { return ot; });
+"undefined"!=typeof globalThis?globalThis:"undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self&&self;var t=function(t,n){return t(n={exports:{}},n.exports),n.exports}((function(t,n){
+/*! axis.js v1.2.1 | (c) 2016 @toddmotto | https://github.com/toddmotto/axis */
+t.exports=function(){var t={},n="Array Object String Date RegExp Function Boolean Number Null Undefined".split(" ");function r(){return Object.prototype.toString.call(this).slice(8,-1)}for(var e=n.length;e--;)t["is"+n[e]]=function(t){return function(n){return r.call(n)===t}}(n[e]);return t}()})),n=t.isObject,r=t.isNumber,e=t.isArray,i=t.isString;function o(t,n){return n+t*(1&n)>>1}function s(t,n){return(t%n+n)%n}function u(t,n){if(!/^(N|S)?(E|W)?$/i.test(t))throw new Error("Invalid compass direction: ".concat(t,". Choose from E, SE, S, SW, W, NW, N or NE."));if(n=n.toLowerCase(),t=t.toUpperCase(),"pointy"===n&&["N","S"].includes(t))throw new Error("Direction ".concat(t," is ambiguous for pointy hexes. Did you mean ").concat(t,"E or ").concat(t,"W?"));if("flat"===n&&["E","W"].includes(t))throw new Error("Direction ".concat(t," is ambiguous for flat hexes. Did you mean N").concat(t," or S").concat(t,"?"));return{pointy:{E:0,SE:1,SW:2,W:3,NW:4,NE:5},flat:{SE:0,S:1,SW:2,NW:3,N:4,NE:5}}[n][t]}function c(t,n){return r(t)||r(n)?r(t)?r(n)||(n=t):t=n:t=n=0,{x:t,y:n}}const a=[{q:1,r:0,s:-1},{q:0,r:1,s:-1},{q:-1,r:1,s:0},{q:-1,r:0,s:1},{q:0,r:-1,s:1},{q:1,r:-1,s:0}],h=[{q:2,r:-1,s:-1},{q:1,r:1,s:-2},{q:-1,r:2,s:-1},{q:-2,r:1,s:1},{q:-1,r:-1,s:2},{q:1,r:-2,s:1}],f={q:1e-6,r:1e-6,s:-2e-6};function l(t){return r(t)?this[t]:this[this.indexOf(t)]}function d({isValidHex:t}){return function(n,e){if(!t(e))return this;const i=r(n)?n:this.indexOf(n);return i<0?this.push(e):this[i]=e,this}}function x(t,n){const r=t.distance(n),e=1/Math.max(r,1);let i=[];for(let o=0;o<=r;o++){const r=t.nudge().lerp(n.nudge(),e*o).round();i.push(this.get(r))}return i}function y({isValidHex:t}){return function(n,r=0,e=!0){if(!t(n))throw new Error("Invalid center hex: ".concat(n,"."));if(!this.get(n))throw new Error("Center hex with coordinates ".concat(n," not present in grid."));let i=[];for(let t=-r;t<=r;t++)for(let o=Math.max(-r,-t-r);o<=Math.min(r,-t+r);o++){const r=this.get(n.cubeToCartesian({q:n.q+t,r:n.r+o}));n.equals(r)&&!e||i.push(r)}return i.filter(Boolean)}}function p({isValidHex:t,signedModulo:n,compassToNumberDirection:r}){return function(e,o="all",s=!1){if(!t(e))throw new Error("Invalid hex: ".concat(e,"."));const u=s?h:a;return"all"===o&&(o=[0,1,2,3,4,5]),[].concat(o).map(t=>{i(t)&&(t=r(t,e.orientation)),(t<0||t>5)&&(t=n(t,6));const{q:o,r:s}=u[t];return this.get(e.cubeToCartesian({q:e.q+o,r:e.r+s}))})}}function g(){if(0===this.length)return 0;const{0:t,length:n,[n-1]:r}=this[0].isPointy()?[...this].sort((t,n)=>n.s-t.s||t.q-n.q):[...this].sort((t,n)=>t.q-n.q);return r.toPoint().x-t.toPoint().x+this[0].width()}function b(){if(0===this.length)return 0;const{0:t,length:n,[n-1]:r}=this[0].isPointy()?[...this].sort((t,n)=>t.r-n.r):[...this].sort((t,n)=>n.s-t.s||t.r-n.r);return r.toPoint().y-t.toPoint().y+this[0].height()}function q({Hex:t}){return function(n,r){return t().fromPoint(n,r)}}function P({Grid:t,Hex:n}){return function({width:r,height:e,start:i,direction:o=1,onCreate:s=(()=>{})}){i=n(i);const[u,c,a]={1:["q","r","s"],3:["r","s","q"],5:["s","q","r"]}[o],h=new t;h.width=r,h.height=e,h.start=i,h.direction=o;for(let t=0;t<r;t++)for(let r=0;r<e;r++){const e=n({[u]:t+i[u],[c]:r+i[c],[a]:-t-r+i[a]});s(e,h),h.push(e)}return h}}function w({Grid:t,Hex:n}){return function({size:r,start:e,direction:i=1,onCreate:o=(()=>{})}){e=n(e);const s={1:{rStart:()=>0,rEnd:t=>r-t},5:{rStart:t=>r-t,rEnd:()=>r+1}},{rStart:u,rEnd:c}=s[i],a=new t;a.size=r,a.start=e,a.direction=i;for(let t=0;t<r;t++)for(let r=u(t);r<c(t);r++){const i=n({q:t+e.q,r:r+e.r,s:-t-r+e.s});o(i,a),a.push(i)}return a}}function m({Grid:t,Hex:n}){return function({radius:r,center:e,onCreate:i=(()=>{})}){e=n(e);const o=new t;o.radius=r,o.center=e;for(let t=-r;t<=r;t++){const s=Math.max(-r,-t-r),u=Math.min(r,-t+r);for(let r=s;r<=u;r++){const s=n({q:t+e.q,r:r+e.r,s:-t-r+e.s});i(s,o),o.push(s)}}return o}}function H({Grid:t,Hex:n,compassToNumberDirection:r,signedModulo:e}){return function({width:s,height:u,start:c,direction:a=(n().isPointy()?0:1),onCreate:h=(()=>{})}){c=n(c),i(a)&&(a=r(a,c.orientation)),(a<0||a>5)&&(a=e(a,6));const[f,l,d]=[["q","r","s"],["r","q","s"],["r","s","q"],["s","r","q"],["s","q","r"],["q","s","r"]][a],[x,y]=c.isPointy()?[s,u]:[u,s],p=new t;p.width=s,p.height=u,p.start=c,p.direction=a;for(let t=0;t<y;t++){const r=o(c.offset,t);for(let e=-r;e<x-r;e++){const r=n({[f]:e+c[f],[l]:t+c[l],[d]:-e-t+c[d]});h(r,p),p.push(r)}}return p}}function O({Grid:t,Hex:n}){return function({radius:r,center:e,onCreate:i=(()=>{})}){e=n(e);const o=new t;o.radius=r,o.center=e;const{q:s,r:u,s:c}=e;let h=n({q:s,r:u-r,s:c+r});for(let t=0;t<6;t++)for(let e=0;e<r;e++){i(h,o),o.push(h);const{q:r,r:e,s:s}=a[t];h=n({q:h.q+r,r:h.r+e,s:h.s+s})}return o}}function j({Grid:t,Hex:n}){return function({radius:r,center:e,onCreate:i=(()=>{})}){e=n(e);let o=new t;i(e,o),o.push(e);for(let t=1;t<=r;t++)o=o.concat(this.ring({radius:t,center:e,onCreate:i}));return o.radius=r,o.center=e,o}}function M({Point:t}){return function(n,r){let e;return({x:e,y:r}=t(n,r)),t(this.x+e,this.y+r)}}function E({Point:t}){return function(n,r){let e;return({x:e,y:r}=t(n,r)),t(this.x-e,this.y-r)}}function C({Point:t}){return function(n,r){let e;return({x:e,y:r}=t(n,r)),t(this.x*e,this.y*r)}}function N({Point:t}){return function(n,r){let e;return({x:e,y:r}=t(n,r)),t(this.x/e,this.y/r)}}function S({ensureXY:t}){const i={add:M({Point:o}),subtract:E({Point:o}),multiply:C({Point:o}),divide:N({Point:o})};function o(o,s){let u;return u=r(o)?t(o,s):e(o)?t(...o):n(o)?t(o.x,o.y):t(0),Object.assign(Object.create(i),u)}return o}const R=S({ensureXY:c});class v extends Array{static isValidHex(t){return!0===(t||{}).__isHoneycombHex}fill(){throw new TypeError("Grid.prototype.fill is not implemented")}includes(t,n=0){return!!(this.indexOf(t,n)+1)}indexOf(t,n=0){const{length:r}=this;let e=Number(n);for(t=R(t),e=Math.max(e>=0?e:r+e,0);e<r;e++)if(this[e].equals(t))return e;return-1}lastIndexOf(t,n=this.length-1){const{length:r}=this;let e=Number(n);for(t=R(t),e=e>=0?Math.min(e,r-1):r+e;e>=0;e--)if(this[e].equals(t))return e;return-1}push(...t){return super.push(...t.filter(v.isValidHex))}splice(t,n,...r){return null==n?super.splice(t):super.splice(t,n,...r.filter(v.isValidHex))}unshift(...t){return super.unshift(...t.filter(v.isValidHex))}}function T(t,n,r){return n in t?Object.defineProperty(t,n,{value:r,enumerable:!0,configurable:!0,writable:!0}):t[n]=r,t}function G(t,n){var r=Object.keys(t);if(Object.getOwnPropertySymbols){var e=Object.getOwnPropertySymbols(t);n&&(e=e.filter((function(n){return Object.getOwnPropertyDescriptor(t,n).enumerable}))),r.push.apply(r,e)}return r}function D(t){for(var n=1;n<arguments.length;n++){var r=null!=arguments[n]?arguments[n]:{};n%2?G(Object(r),!0).forEach((function(n){T(t,n,r[n])})):Object.getOwnPropertyDescriptors?Object.defineProperties(t,Object.getOwnPropertyDescriptors(r)):G(Object(r)).forEach((function(n){Object.defineProperty(t,n,Object.getOwnPropertyDescriptor(r,n))}))}return t}function z(t,n){if(null==t)return{};var r,e,i=function(t,n){if(null==t)return{};var r,e,i={},o=Object.keys(t);for(e=0;e<o.length;e++)r=o[e],n.indexOf(r)>=0||(i[r]=t[r]);return i}(t,n);if(Object.getOwnPropertySymbols){var o=Object.getOwnPropertySymbols(t);for(e=0;e<o.length;e++)r=o[e],n.indexOf(r)>=0||Object.prototype.propertyIsEnumerable.call(t,r)&&(i[r]=t[r])}return i}function V({Hex:t}){return function(...n){return Object.assign(this,t(...n))}}function W(){return{x:this.x,y:this.y}}function I(){return{q:this.q,r:this.r,s:this.s}}function X({q:t,r:n}){let r,e;return this.isPointy()?(r=t+o(this.offset,n),e=n):(r=t,e=n+o(this.offset,t)),{x:r,y:e}}function Y(){return"pointy"===this.orientation.toLowerCase()}function B(){return"flat"===this.orientation.toLowerCase()}function _(){const{xRadius:t}=this.size;return this.isPointy()?t*Math.sqrt(3):2*t}function A(){const{yRadius:t}=this.size;return this.isPointy()?2*t:t*Math.sqrt(3)}function L({Point:t}){return function(){const n=this.width(),r=this.height(),{x:e,y:i}=this.origin;return this.isPointy()?[t(n-e,.25*r-i),t(n-e,.75*r-i),t(.5*n-e,r-i),t(0-e,.75*r-i),t(0-e,.25*r-i),t(.5*n-e,0-i)]:[t(n-e,.5*r-i),t(.75*n-e,r-i),t(.25*n-e,r-i),t(0-e,.5*r-i),t(.25*n-e,0-i),t(.75*n-e,0-i)]}}function k({Point:t}){return function(){const{x:n,y:r}=this.origin;return t(this.width()/2-n,this.height()/2-r)}}function F({Point:t}){return function(){const{q:n,r:r,size:e}=this,{xRadius:i,yRadius:o}=e;let s,u;return this.isPointy()?(s=i*Math.sqrt(3)*(n+r/2),u=3*o/2*r):(s=3*i/2*n,u=o*Math.sqrt(3)*(r+n/2)),t(s,u)}}function U({Point:t,Hex:n}){return function(r,e){const{xRadius:i,yRadius:o}=this.size;let s,u,c;return({x:s,y:e}=t(r,e).subtract(this.center())),this.isPointy()?(u=Math.sqrt(3)*s/(3*i)-e/(3*o),c=2/3*(e/o)):(u=2/3*(s/i),c=Math.sqrt(3)*e/(3*o)-s/(3*i)),n({q:u,r:c,s:-u-c}).round()}}function J({Hex:t,Point:n}){return function(r){const{x:e,y:i}=n(r);return t(this.x+e,this.y+i,D({},this))}}function $({Hex:t,Point:n}){return function(r){const{x:e,y:i}=n(r);return t(this.x-e,this.y-i,D({},this))}}function K({Point:t}){return function(n){if(null!=n&&(e(n)||r(n.x)&&r(n.y))){const{x:r,y:e}=t(n);return this.x===r&&this.y===e}return!1}}function Q(t){return Math.max(Math.abs(this.q-t.q),Math.abs(this.r-t.r),Math.abs(this.s-t.s))}function Z({Hex:t}){return function(){let{q:n,r:r,s:e}=this,i=Math.round(n),o=Math.round(r),s=Math.round(e);const u=Math.abs(n-i),c=Math.abs(r-o),a=Math.abs(e-s);return u>c&&u>a?i=-o-s:c>a?o=-i-s:s=-i-o,t(D(D({},this),{},{q:i,r:o,s:s}))}}function tt({Hex:t}){return function(n,r){const e=this.q*(1-r)+n.q*r,i=this.r*(1-r)+n.r*r;return t(D(D({},this),{},{q:e,r:i,s:-e-i}))}}function nt({Hex:t}){return function(){const{q:n,r:r,s:e}=f;return t(D(D({},this),{},{q:this.q+n,r:this.r+r,s:this.s+e}))}}function rt(){return"".concat(this.x,",").concat(this.y)}const et={thirdCoordinate:function(t,n){return-t-n}};const it=S({ensureXY:c}),ot=function({ensureXY:t,normalizeRadiuses:i,Point:s}){return function(u={}){const c=function({Point:t}){return function(n,r){let e,i,s;return({x:e,y:r}=t(n,r)),this.isPointy()?(i=e-o(this.offset,r),s=r):(i=e,s=r-o(this.offset,e)),{q:i,r:s,s:-i-s}}}({Point:s}),a={__isHoneycombHex:!0,orientation:"pointy",origin:0,size:{xRadius:1,yRadius:1},offset:-1,get q(){return this.cartesianToCube(this).q},get r(){return this.cartesianToCube(this).r},get s(){return this.cartesianToCube(this).s},add:J({Hex:f,Point:s}),cartesian:W,cartesianToCube:c,center:k({Point:s}),coordinates:W,corners:L({Point:s}),cube:I,cubeToCartesian:X,distance:Q,equals:K({Point:s}),fromPoint:U({Point:s,Hex:f}),height:A,isFlat:B,isPointy:Y,lerp:tt({Hex:f}),nudge:nt({Hex:f}),round:Z({Hex:f}),set:V({Hex:f}),subtract:$({Hex:f,Point:s}),toCartesian:X,toCube:c,toPoint:F({Point:s}),toString:rt,width:_},h=Object.assign(a,u);function f(i,o,s={}){let u;if(n(i)){let{q:t,r:n,s:e}=i,c=z(i,["q","r","s"]);if(r(t)||r(n)||r(e)){const r=t+n+e;if(Number.isNaN(r)||r>1e-12)throw new Error("Cube coordinates must have a sum of 0. q: ".concat(t,", r: ").concat(n,", s: ").concat(e,", sum: ").concat(t+n+e,"."));({x:u,y:o}=h.cubeToCartesian({q:t,r:n,s:e}))}else({x:u,y:o}=i);s=c}else e(i)?([u,o]=i,s={}):u=i;return Object.assign(Object.create(h),Object.assign(s,t(u,o)))}return h.size=i(h.size,h.isPointy()),h.origin=s(h.origin),Object.assign(f,et,{toJSON:()=>u}),f}}({ensureXY:c,normalizeRadiuses:function(t,e){if(n(t)){if(r(t.xRadius)&&r(t.yRadius))return t;const{width:n,height:i}=t;if(r(n)&&r(i))return e?{xRadius:n/Math.sqrt(3),yRadius:i/2}:{xRadius:n/2,yRadius:i/Math.sqrt(3)}}if(r(t))return{xRadius:t,yRadius:t};throw new Error("Invalid size: ".concat(t,". Set it as a number or as an object containing width and height."))},Point:it}),st=function({extendHex:t,Grid:n,Point:i}){const{isValidHex:o}=n;return function(c=t()){function a(...t){return t=t.filter(Boolean),e(t[0])&&(0===t[0].length||t[0].some(t=>!r(t)))&&(t=t[0]),new n(...t.map(t=>c(t)))}return Object.assign(a,{Hex:c,isValidHex:o,pointToHex:q({Point:i,Hex:c}),parallelogram:P({Grid:n,Hex:c}),triangle:w({Grid:n,Hex:c}),hexagon:m({Grid:n,Hex:c}),rectangle:H({Grid:n,Hex:c,compassToNumberDirection:u,signedModulo:s}),ring:O({Grid:n,Hex:c}),spiral:j({Grid:n,Hex:c})}),Object.assign(n.prototype,{get:l,hexesBetween:x,hexesInRange:y({isValidHex:o}),neighborsOf:p({isValidHex:o,signedModulo:s,compassToNumberDirection:u}),pointHeight:b,pointWidth:g,set:d({isValidHex:o})}),a}}({extendHex:ot,Grid:v,Point:it});
+//# sourceMappingURL=honeycomb.esm.min.js.map
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../webpack/buildin/global.js */ "./node_modules/webpack/buildin/global.js")))
+
+/***/ }),
+
 /***/ "./node_modules/interactjs/dist/interact.min.js":
 /*!******************************************************!*\
   !*** ./node_modules/interactjs/dist/interact.min.js ***!
@@ -73376,7 +73397,7 @@ var StateMachine = /*#__PURE__*/function () {
     this.maxIterations = 10;
     this.halt = false;
     this.pause = false;
-    this.throttle = 0;
+    this.throttle = 1000;
     this._asyncCompute = false;
     this._postIteration = null;
     this.buildCollections();
@@ -75854,6 +75875,804 @@ var initUI = function initUI(app) {
 
 /***/ }),
 
+/***/ "./src/scripts/game-of-life-hex-edition/hex-state-machine.ts":
+/*!*******************************************************************!*\
+  !*** ./src/scripts/game-of-life-hex-edition/hex-state-machine.ts ***!
+  \*******************************************************************/
+/*! exports provided: HexStateMachine, HexStateMachineWrappingGridCollection, HexCell */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "HexStateMachine", function() { return HexStateMachine; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "HexStateMachineWrappingGridCollection", function() { return HexStateMachineWrappingGridCollection; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "HexCell", function() { return HexCell; });
+/* harmony import */ var _lib_state_machine__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../lib/state-machine */ "./src/lib/state-machine.js");
+/* harmony import */ var _lib_state_machine__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_lib_state_machine__WEBPACK_IMPORTED_MODULE_0__);
+var __extends = (undefined && undefined.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+
+var singleton;
+var HexCell = /** @class */ (function (_super) {
+    __extends(HexCell, _super);
+    function HexCell(machine, state, callback) {
+        return _super.call(this, machine, state, callback) || this;
+    }
+    Object.defineProperty(HexCell.prototype, "data", {
+        get: function () { return this._data; },
+        set: function (val) { this._data = val; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HexCell.prototype, "id", {
+        get: function () { return this.state.id; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HexCell.prototype, "cellState", {
+        get: function () { return this.state.state; },
+        set: function (val) { this.state.state = val; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HexCell.prototype, "updated", {
+        get: function () { return this.state.updated; },
+        set: function (val) { this.state.updated = val; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HexCell.prototype, "neighborCount", {
+        get: function () {
+            var _this = this;
+            var cellStateInt = function (bx, by) {
+                var el = _this.machine.elements.get(bx, by);
+                return el.cellState ? 1 : 0;
+            };
+            var x = this.x, y = this.y;
+            return cellStateInt(x, y - 1) +
+                cellStateInt(x + 1, y) +
+                cellStateInt(x + 1, y + 1) +
+                cellStateInt(x, y + 1) +
+                cellStateInt(x - 1, y + 1) +
+                cellStateInt(x - 1, y);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    HexCell.prototype.nextState = function () {
+        var neighbors = this.neighborCount;
+        return this.machine.rules.evaluate(this.cellState, neighbors);
+    };
+    HexCell.cellId = function (x, y) {
+        return "X" + x + "Y" + y;
+    };
+    HexCell.advance = function (el) {
+        var nextState = el.nextState();
+        var updated = el.cellState !== nextState;
+        el.state.next = nextState;
+        el.updated = updated;
+        return [el];
+    };
+    return HexCell;
+}(_lib_state_machine__WEBPACK_IMPORTED_MODULE_0___default.a.EntityElement));
+/**
+ *
+ */
+var HexStateMachineWrappingGridCollection = /** @class */ (function (_super) {
+    __extends(HexStateMachineWrappingGridCollection, _super);
+    function HexStateMachineWrappingGridCollection(x, y, machine) {
+        var _this = _super.call(this, machine) || this;
+        _this._x = x;
+        _this._y = y;
+        _this.elements = {};
+        _this.clear();
+        return _this;
+    }
+    HexStateMachineWrappingGridCollection.prototype.addH = function (x, y, el) {
+        var elKey = x + "_" + y;
+        this.elements[elKey] = el;
+        return this;
+    };
+    HexStateMachineWrappingGridCollection.prototype.get = function (x, y) {
+        x = x < 0 ? this._x - 1 : x;
+        y = y < 0 ? this._y - 1 : y;
+        x = x > this._x - 1 ? 0 : x;
+        y = y > this._y - 1 ? 0 : y;
+        var elKey = x + "_" + y;
+        return this.elements[elKey];
+    };
+    HexStateMachineWrappingGridCollection.prototype.clear = function () {
+        this.elements = {};
+    };
+    HexStateMachineWrappingGridCollection.prototype.toArray = function () {
+        return Object.values(this.elements);
+    };
+    return HexStateMachineWrappingGridCollection;
+}(_lib_state_machine__WEBPACK_IMPORTED_MODULE_0___default.a.StateMachineCollection));
+var HexStateMachineRules = /** @class */ (function () {
+    function HexStateMachineRules(app) {
+        var _this = this;
+        this.evaluate = function (state, neighbors) {
+            var self = _this;
+            var startState = state ? '_On' : '_Off';
+            startState += neighbors;
+            return self[startState];
+        };
+        this.app = app;
+        this._On1 = false;
+        this._On2 = true;
+        this._On3 = true;
+        this._On4 = false;
+        this._On5 = false;
+        this._On6 = false;
+        this._Off1 = false;
+        this._Off2 = false;
+        this._Off3 = true;
+        this._Off4 = false;
+        this._Off5 = false;
+        this._Off6 = false;
+    }
+    Object.defineProperty(HexStateMachineRules.prototype, "On1", {
+        get: function () { return this._On1; },
+        set: function (v) {
+            this._On1 = v;
+            this.app.rulesUpdated();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HexStateMachineRules.prototype, "On2", {
+        get: function () { return this._On2; },
+        set: function (v) {
+            this._On2 = v;
+            this.app.rulesUpdated();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HexStateMachineRules.prototype, "On3", {
+        get: function () { return this._On3; },
+        set: function (v) {
+            this._On3 = v;
+            this.app.rulesUpdated();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HexStateMachineRules.prototype, "On4", {
+        get: function () { return this._On4; },
+        set: function (v) {
+            this._On4 = v;
+            this.app.rulesUpdated();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HexStateMachineRules.prototype, "On5", {
+        get: function () { return this._On5; },
+        set: function (v) {
+            this._On5 = v;
+            this.app.rulesUpdated();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HexStateMachineRules.prototype, "On6", {
+        get: function () { return this._On6; },
+        set: function (v) {
+            this._On6 = v;
+            this.app.rulesUpdated();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HexStateMachineRules.prototype, "Off1", {
+        get: function () { return this._Off1; },
+        set: function (v) {
+            this._Off1 = v;
+            this.app.rulesUpdated();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HexStateMachineRules.prototype, "Off2", {
+        get: function () { return this._Off2; },
+        set: function (v) {
+            this._Off2 = v;
+            this.app.rulesUpdated();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HexStateMachineRules.prototype, "Off3", {
+        get: function () { return this._Off3; },
+        set: function (v) {
+            this._Off3 = v;
+            this.app.rulesUpdated();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HexStateMachineRules.prototype, "Off4", {
+        get: function () { return this._Off4; },
+        set: function (v) {
+            this._Off4 = v;
+            this.app.rulesUpdated();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HexStateMachineRules.prototype, "Off5", {
+        get: function () { return this._Off5; },
+        set: function (v) {
+            this._Off5 = v;
+            this.app.rulesUpdated();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HexStateMachineRules.prototype, "Off6", {
+        get: function () { return this._Off6; },
+        set: function (v) {
+            this._Off6 = v;
+            this.app.rulesUpdated();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    return HexStateMachineRules;
+}());
+var HexStateMachine = /** @class */ (function (_super) {
+    __extends(HexStateMachine, _super);
+    function HexStateMachine(hexGrid, width, height, cellSize, percentAlive) {
+        var _this = _super.call(this) || this;
+        singleton = _this;
+        _this._hexGrid = hexGrid;
+        _this._cellSize = cellSize;
+        _this._gridWidth = width;
+        _this._gridHeight = height;
+        _this._percentAlive = percentAlive;
+        _this._onEmitElement = null;
+        _this._onEmitIteration = null;
+        _this._onEmitReset = null;
+        _this._rules = new HexStateMachineRules(_this);
+        _this.gridNumbers = [];
+        _this._gridHeight = height;
+        _this.elements = new HexStateMachineWrappingGridCollection(width, height, _this);
+        var machine = _this;
+        _this.builders.add(new _lib_state_machine__WEBPACK_IMPORTED_MODULE_0___default.a.StateBuilder(machine, null, function () {
+            hexGrid.forEach(function (hex) {
+                var cellCnt = machine.gridWidth * machine.gridHeight, cx = hex.x, cy = hex.y;
+                var nel = new HexCell(machine, {
+                    id: HexCell.cellId(hex.x, hex.y),
+                    x: cx,
+                    y: cy,
+                    state: (Math.random() * cellCnt) <
+                        (cellCnt / machine.percentAlive),
+                    updated: true
+                }, HexCell.advance);
+                nel.data = hex;
+                machine.elements.addH(hex.x, hex.y, nel);
+            });
+        }));
+        _this.postIteration = function (machine, els) {
+            var gn = 0;
+            machine.doEmitIteration(els);
+            els.forEach(function (el) {
+                gn += el.cellState ? ((el.x * machine.gridWidth) + el.y) / machine.gridWidth : 0;
+                el.cellState = el.state.next;
+            });
+            machine.gridNumber = gn;
+        };
+        _this.renderers.add(new _lib_state_machine__WEBPACK_IMPORTED_MODULE_0___default.a.StateRenderer(machine, null, function (el) {
+            return machine.doEmitElement(el);
+        }));
+        return _this;
+    }
+    Object.defineProperty(HexStateMachine.prototype, "gridNumber", {
+        get: function () {
+            return this.gridNumbers.reduce(function (a, b) { return a + b; }, 0) / this.gridNumbers.length;
+        },
+        set: function (v) {
+            this.gridNumbers.unshift(v);
+            if (this.gridNumbers.length > 9) {
+                this.gridNumbers.pop();
+            }
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HexStateMachine.prototype, "rateOfChange", {
+        get: function () {
+            var roc = [];
+            function getChange(element, index, array) {
+                if (index - 1 >= 0) {
+                    roc.push(element - array[index - 1]);
+                }
+            }
+            this.gridNumbers.forEach(getChange);
+            return roc.reduce(function (a, b) { return a + b; }, 0) / roc.length;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HexStateMachine.prototype, "rules", {
+        get: function () { return this._rules; },
+        set: function (r) { this._rules = r; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HexStateMachine.prototype, "gridWidth", {
+        get: function () { return this._gridWidth; },
+        set: function (v) { this._gridWidth = v; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HexStateMachine.prototype, "gridHeight", {
+        get: function () { return this._gridHeight; },
+        set: function (v) { this._gridHeight = v; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HexStateMachine.prototype, "percentAlive", {
+        get: function () { return this._percentAlive; },
+        set: function (v) { this._percentAlive = v; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HexStateMachine.prototype, "cellSize", {
+        get: function () { return this._cellSize; },
+        set: function (v) { this._cellSize = v; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HexStateMachine.prototype, "onEmitElement", {
+        get: function () { return this._onEmitElement; },
+        set: function (v) { this._onEmitElement = v; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HexStateMachine.prototype, "onEmitIteration", {
+        get: function () { return this._onEmitIteration; },
+        set: function (v) { this._onEmitIteration = v; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(HexStateMachine.prototype, "onEmitReset", {
+        get: function () { return this._onEmitReset; },
+        set: function (v) { this._onEmitReset = v; },
+        enumerable: true,
+        configurable: true
+    });
+    HexStateMachine.prototype.rulesUpdated = function () {
+        singleton.stop();
+        setTimeout(function () {
+            singleton.run(-1);
+        });
+        this.doEmitReset();
+    };
+    HexStateMachine.prototype.doEmitElement = function (el) {
+        if (singleton.onEmitElement)
+            singleton.onEmitElement(singleton, el);
+    };
+    HexStateMachine.prototype.doEmitIteration = function (els) {
+        if (singleton.onEmitIteration)
+            singleton.onEmitIteration(singleton, els);
+    };
+    HexStateMachine.prototype.doEmitReset = function () {
+        if (singleton.onEmitReset)
+            singleton.onEmitReset(singleton);
+    };
+    return HexStateMachine;
+}(_lib_state_machine__WEBPACK_IMPORTED_MODULE_0___default.a.StateMachine));
+
+
+
+/***/ }),
+
+/***/ "./src/scripts/game-of-life-hex-edition/index.ts":
+/*!*******************************************************!*\
+  !*** ./src/scripts/game-of-life-hex-edition/index.ts ***!
+  \*******************************************************/
+/*! exports provided: GameOfLifeHex */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "GameOfLifeHex", function() { return GameOfLifeHex; });
+/* harmony import */ var _hex_state_machine__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./hex-state-machine */ "./src/scripts/game-of-life-hex-edition/hex-state-machine.ts");
+/* harmony import */ var _ui__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ui */ "./src/scripts/game-of-life-hex-edition/ui.ts");
+/* harmony import */ var honeycomb_grid__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! honeycomb-grid */ "./node_modules/honeycomb-grid/dist/honeycomb.esm.min.js");
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_3__);
+
+
+
+
+var singleton;
+var GameOfLifeHex = /** @class */ (function () {
+    /**
+     *
+     * @param {*} emerga
+     */
+    function GameOfLifeHex(emerga) {
+        singleton = this;
+        this._emerga = emerga;
+        this.inited = false;
+        this._globalCompositeOperation = 'luminosity';
+        this._gridWidth = 120;
+        this._gridHeight = 80;
+        this._cellSize = jquery__WEBPACK_IMPORTED_MODULE_3___default()(window).width() / this._gridWidth;
+        this.stateMachine;
+        this._percentAlive = 8;
+        this._ui = _ui__WEBPACK_IMPORTED_MODULE_1__["GameOfLifeHexUI"];
+        this._scaleFactor = 512;
+        this._complexityRestartThreshold = 0.1;
+        this.zcnt = 0;
+        this._hex = Object(honeycomb_grid__WEBPACK_IMPORTED_MODULE_2__["extendHex"])({
+            size: 20,
+            orientation: 'flat'
+        }),
+            this._grid = Object(honeycomb_grid__WEBPACK_IMPORTED_MODULE_2__["defineGrid"])(this._hex),
+            this._gridElements = this._grid.rectangle({
+                width: this._gridWidth,
+                height: this._gridHeight
+            });
+        this.setupStateMachine();
+    }
+    Object.defineProperty(GameOfLifeHex.prototype, "ui", {
+        get: function () { return this._ui; },
+        set: function (v) { this._ui = v; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(GameOfLifeHex.prototype, "emerga", {
+        get: function () { return this._emerga; },
+        set: function (e) { this._emerga = e; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(GameOfLifeHex.prototype, "globalCompositeOperation", {
+        get: function () { return this._globalCompositeOperation; },
+        set: function (v) {
+            this._globalCompositeOperation = v;
+            this.settingsUpdated();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(GameOfLifeHex.prototype, "complexityRestartThreshold", {
+        get: function () { return this._complexityRestartThreshold; },
+        set: function (v) { this._complexityRestartThreshold = v; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(GameOfLifeHex.prototype, "percentAlive", {
+        get: function () { return this._percentAlive; },
+        set: function (v) { this._percentAlive = v; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(GameOfLifeHex.prototype, "cellSize", {
+        get: function () { return this._cellSize; },
+        set: function (v) {
+            this._cellSize = v;
+            this.settingsUpdated();
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(GameOfLifeHex.prototype, "gridWidth", {
+        get: function () { return this._gridWidth; },
+        set: function (v) {
+            this._gridWidth = v;
+            this.stateMachine.gridWidth = v;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(GameOfLifeHex.prototype, "gridHeight", {
+        //
+        get: function () { return this._gridHeight; },
+        set: function (v) { this.stateMachine.gridHeight = v; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(GameOfLifeHex.prototype, "scaleFactor", {
+        //
+        get: function () { return this._scaleFactor; },
+        set: function (v) { this._scaleFactor = v; },
+        enumerable: true,
+        configurable: true
+    });
+    /**
+     *
+     * @param {*} machine
+     * @param {*} els
+     */
+    GameOfLifeHex.prototype.elementEmitted = function (machine, el) {
+        if (el.updated)
+            singleton.ui.addToRender(el);
+    };
+    GameOfLifeHex.prototype.iterationEmitted = function (machine, els) {
+        var _this = this;
+        setTimeout(function () {
+            if (machine.rateOfChange < _this._complexityRestartThreshold) {
+                singleton.zcnt++;
+                if (singleton.zcnt === 10) {
+                    singleton.zcnt = 0;
+                    return singleton.restart();
+                }
+            }
+            singleton.ui.addToRender(els);
+        }, 0);
+    };
+    /**
+     *
+     */
+    GameOfLifeHex.prototype.settingsUpdated = function () {
+        singleton.restart();
+    };
+    /**
+     *
+     */
+    GameOfLifeHex.prototype.setupStateMachine = function () {
+        var smRules = null, machine = null;
+        if (singleton.stateMachine)
+            smRules = singleton.rules;
+        singleton.stateMachine = machine = new _hex_state_machine__WEBPACK_IMPORTED_MODULE_0__["HexStateMachine"](this._gridElements, this._gridWidth, this._gridHeight, this._cellSize, this._percentAlive);
+        if (smRules)
+            machine.rules = smRules;
+        machine.onEmitElement = this.elementEmitted;
+        //machine.onEmitIteration = this.iterationEmitted
+        machine.onEmitReset = this.settingsUpdated;
+    };
+    /**
+     *
+     */
+    GameOfLifeHex.prototype.restart = function () {
+        if (!singleton.inited)
+            return;
+        if (singleton.stateMachine && !singleton.stateMachine.halted) {
+            singleton.stateMachine.stop();
+            singleton.setupStateMachine();
+            singleton.inited = true;
+            singleton.stateMachine.run(-1);
+        }
+    };
+    /**
+     *
+     */
+    GameOfLifeHex.prototype.init = function () {
+        this.ui.init(this);
+    };
+    /**
+     *
+     */
+    GameOfLifeHex.prototype.run = function () {
+        this.ui.run();
+        singleton.stateMachine.run(-1);
+    };
+    return GameOfLifeHex;
+}());
+
+
+
+/***/ }),
+
+/***/ "./src/scripts/game-of-life-hex-edition/ui.ts":
+/*!****************************************************!*\
+  !*** ./src/scripts/game-of-life-hex-edition/ui.ts ***!
+  \****************************************************/
+/*! exports provided: GameOfLifeHexUI, GameOfLifeHexUIClass */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "GameOfLifeHexUI", function() { return GameOfLifeHexUI; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "GameOfLifeHexUIClass", function() { return GameOfLifeHexUIClass; });
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _hex_state_machine__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./hex-state-machine */ "./src/scripts/game-of-life-hex-edition/hex-state-machine.ts");
+
+
+var RenderingSettings = /** @class */ (function () {
+    function RenderingSettings(app) {
+        this._app = app;
+        this._scaleFactor = 256;
+    }
+    Object.defineProperty(RenderingSettings.prototype, "scaleFactor", {
+        get: function () {
+            return this._scaleFactor;
+        },
+        set: function (v) {
+            this._scaleFactor = v;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    return RenderingSettings;
+}());
+var GameOfLifeHexUI;
+var GameOfLifeHexUIClass = /** @class */ (function () {
+    function GameOfLifeHexUIClass(e) {
+        var _this = this;
+        this.clearCanvas = function () {
+        };
+        this.initControls = function () {
+            var g = g = _this._app.emerga.guis['gui'];
+            var folder = g.addFolder('Starting Conditions');
+            folder.add(_this._app, 'percentAlive', 1, 99).step(1).onChange(_this._app.settingsUpdated());
+            folder.open();
+            var a = _this._app, rulesObj = a.stateMachine.rules, fr = folder.addFolder('Game of life Rules'), fonr = fr.addFolder('On State Rules'), foffr = fr.addFolder('Off State Rules');
+            fonr.add(rulesObj, 'On1').onChange(a.settingsUpdated());
+            fonr.add(rulesObj, 'On2').onChange(a.settingsUpdated());
+            fonr.add(rulesObj, 'On3').onChange(a.settingsUpdated());
+            fonr.add(rulesObj, 'On4').onChange(a.settingsUpdated());
+            fonr.add(rulesObj, 'On5').onChange(a.settingsUpdated());
+            fonr.add(rulesObj, 'On6').onChange(a.settingsUpdated());
+            foffr.add(rulesObj, 'Off1').onChange(a.settingsUpdated());
+            foffr.add(rulesObj, 'Off2').onChange(a.settingsUpdated());
+            foffr.add(rulesObj, 'Off3').onChange(a.settingsUpdated());
+            foffr.add(rulesObj, 'Off4').onChange(a.settingsUpdated());
+            foffr.add(rulesObj, 'Off5').onChange(a.settingsUpdated());
+            foffr.add(rulesObj, 'Off6').onChange(a.settingsUpdated());
+            fr.open();
+            fonr.open();
+            foffr.open();
+            folder = g.addFolder('Execution');
+            folder.add(a, 'complexityRestartThreshold', 0, 10).step(0.1).onChange(a.settingsUpdated());
+            folder.open();
+            g.remember(a);
+        };
+        this.initCanvas = function () {
+            var template = "\n        <style>\n            canvas {\n                width:100%;\n                height:100%\n            }\n            #wrapper {\n                width:100%;\n                height:100%\n            }\n        </style>\n        <div id=\"wrapper\">\n            <canvas width=\"1800\" height=\"1200 id=\"main\"></canvas>\n        </div>\n        ";
+            jquery__WEBPACK_IMPORTED_MODULE_0___default()(template).appendTo('body', function () {
+                _this._app.emerga.initCanvas('main');
+            });
+        };
+        this.initGrid = function () {
+            jquery__WEBPACK_IMPORTED_MODULE_0___default()('canvas').click(function (e) {
+                var x = e.clientX, y = e.clientY;
+                var hexCoordinates = _this._app._grid.pointToHex(x, y);
+                // do something
+            });
+        };
+        this.renderGrid = function () {
+            // render 10,000 hexes
+            _this._app._gridElements.forEach(function (hex) {
+                _this.renderElement(hex);
+            });
+        };
+        this.renderElement = function (hex) {
+            if (!hex) {
+                return;
+            }
+            var foreColor = '#000';
+            if (hex instanceof _hex_state_machine__WEBPACK_IMPORTED_MODULE_1__["HexCell"]) {
+                foreColor = hex.state.state ? '#fff' : '#333';
+                hex = hex.data;
+            }
+            var point = hex.toPoint();
+            var canvas = document.getElementById('main'), ctx;
+            if (canvas) {
+                ctx = canvas.getContext("2d");
+            }
+            if (ctx) {
+                ctx.beginPath();
+                ctx.arc(point.x, point.y, 20, 0, 2 * Math.PI);
+                ctx.fillStyle = foreColor;
+                ctx.fill();
+            }
+            // const _graphics:any = new PIXI.Graphics(),
+            // point = hex.toPoint(),
+            // corners = hex.corners().map((corner:any) => corner.add(point)),
+            // [firstCorner, ...otherCorners] = corners
+            // _graphics.lineStyle(1, foreColor)
+            // _graphics.moveTo(firstCorner.x, firstCorner.y)
+            // _graphics.beginFill('#fff', 1)
+            // otherCorners.forEach(({ x, y }:any) => _graphics.lineTo(x, y))
+            // _graphics.lineTo(firstCorner.x, firstCorner.y)
+            // _graphics.endFill()
+            // this._pixi.stage.addChild(
+            //     _graphics
+            // )
+        };
+        this.addToRender = function (el) {
+            _this.renderElement(el);
+            // if (Array.isArray(el)) {
+            //     this._elementsToRender = el
+            // } else {
+            //     this._elementsToRender.push(el)
+            // }
+        };
+        this.animate = function () {
+            var self = _this;
+            _this.clearCanvas();
+            var stats = _this.app.emerga.stats[0], _animate = function () {
+                stats.begin();
+                var el = self._elementsToRender.pop();
+                while (el) {
+                    self.renderElement(el);
+                    el = self._elementsToRender.pop();
+                }
+                stats.end();
+                requestAnimationFrame(_animate);
+            };
+            requestAnimationFrame(_animate);
+        };
+        this.init = function (app) {
+            _this._app = app;
+            _this.initCanvas();
+            _this._app.emerga
+                .initStats(0)
+                .initGUI('gui', {
+                load: JSON,
+                preset: 'Game of Life'
+            });
+            _this.initGrid();
+            _this.initControls();
+        };
+        this._app = e;
+        this._renderingSettings = new RenderingSettings(this);
+        this._elementsToRender = [];
+    }
+    GameOfLifeHexUIClass.getInstance = function (e) {
+        return GameOfLifeHexUI ? GameOfLifeHexUI : new GameOfLifeHexUIClass(null);
+    };
+    Object.defineProperty(GameOfLifeHexUIClass.prototype, "app", {
+        get: function () {
+            return this._app;
+        },
+        set: function (v) {
+            this._app = v;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(GameOfLifeHexUIClass.prototype, "onUpdated", {
+        get: function () {
+            return this._onUpdated;
+        },
+        set: function (s) {
+            this._onUpdated = s;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    GameOfLifeHexUIClass.prototype.updateStatusLight = function (s) {
+        jquery__WEBPACK_IMPORTED_MODULE_0___default()('#quick-status')
+            .html(s === 'success' ? 'Success' : 'Error')
+            .removeClass('alert-' + (s === 'success' ? 'danger' : s))
+            .addClass('alert-' + (s === 'success' ? s : 'danger'));
+    };
+    GameOfLifeHexUIClass.prototype.reset = function () {
+        this.updateStatusLight('success');
+    };
+    GameOfLifeHexUIClass.prototype.resizeGraphArea = function () {
+    };
+    GameOfLifeHexUIClass.prototype.run = function () {
+        this.renderGrid();
+    };
+    return GameOfLifeHexUIClass;
+}());
+GameOfLifeHexUI = GameOfLifeHexUIClass.getInstance(undefined);
+
+
+
+/***/ }),
+
 /***/ "./src/scripts/game-of-life/index.js":
 /*!*******************************************!*\
   !*** ./src/scripts/game-of-life/index.js ***!
@@ -77025,6 +77844,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _particle_galaxy_index__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./particle-galaxy/index */ "./src/scripts/particle-galaxy/index.js");
 /* harmony import */ var _wolfram_model_index__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./wolfram-model/index */ "./src/scripts/wolfram-model/index.js");
 /* harmony import */ var _critters_index__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./critters/index */ "./src/scripts/critters/index.js");
+/* harmony import */ var _game_of_life_hex_edition_index__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./game-of-life-hex-edition/index */ "./src/scripts/game-of-life-hex-edition/index.ts");
+
 
 
 
@@ -77041,6 +77862,7 @@ var EmergaScriptsClass = /** @class */ (function () {
             GameOfLife: _game_of_life_index__WEBPACK_IMPORTED_MODULE_1__["GameOfLife"],
             Critters: _critters_index__WEBPACK_IMPORTED_MODULE_5__["Critters"],
             OmegaCell: _omega_cell_index__WEBPACK_IMPORTED_MODULE_0__["OmegaCell"],
+            GameOfLifeHex: _game_of_life_hex_edition_index__WEBPACK_IMPORTED_MODULE_6__["GameOfLifeHex"]
         };
     }
     Object.defineProperty(EmergaScriptsClass.prototype, "scripts", {
