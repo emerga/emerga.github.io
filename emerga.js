@@ -53517,6 +53517,20 @@ var Emerga = /** @class */ (function () {
         }
         return this;
     };
+    Object.defineProperty(Emerga.prototype, "ctx", {
+        get: function () {
+            if (!this.canvas) {
+                var canvas = document.getElementById('main');
+                if (canvas) {
+                    this.canvas = canvas;
+                    this.context = this.canvas.getContext("2d");
+                }
+            }
+            return this.context;
+        },
+        enumerable: true,
+        configurable: true
+    });
     Emerga.prototype.initStats = function (type) {
         if (this.stats[type]) {
             return;
@@ -75940,12 +75954,14 @@ var HexCell = /** @class */ (function (_super) {
                 return el.cellState ? 1 : 0;
             };
             var x = this.x, y = this.y;
-            return cellStateInt(x, y - 1) +
-                cellStateInt(x + 1, y) +
-                cellStateInt(x + 1, y + 1) +
-                cellStateInt(x, y + 1) +
+            return cellStateInt(x - 1, y - 1) +
+                cellStateInt(x - 1, y) +
                 cellStateInt(x - 1, y + 1) +
-                cellStateInt(x - 1, y);
+                cellStateInt(x, y - 1) +
+                cellStateInt(x, y + 1) +
+                cellStateInt(x + 1, y - 1) +
+                cellStateInt(x + 1, y) +
+                cellStateInt(x + 1, y + 1);
         },
         enumerable: true,
         configurable: true
@@ -76002,13 +76018,6 @@ var HexStateMachineWrappingGridCollection = /** @class */ (function (_super) {
 }(_lib_state_machine__WEBPACK_IMPORTED_MODULE_0___default.a.StateMachineCollection));
 var HexStateMachineRules = /** @class */ (function () {
     function HexStateMachineRules(app) {
-        var _this = this;
-        this.evaluate = function (state, neighbors) {
-            var self = _this;
-            var startState = state ? '_On' : '_Off';
-            startState += neighbors;
-            return self[startState];
-        };
         this.app = app;
         this._On1 = false;
         this._On2 = true;
@@ -76131,6 +76140,12 @@ var HexStateMachineRules = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
+    HexStateMachineRules.prototype.evaluate = function (state, neighbors) {
+        var self = this;
+        var startState = state ? '_On' : '_Off';
+        startState += neighbors;
+        return self[startState];
+    };
     return HexStateMachineRules;
 }());
 var HexStateMachine = /** @class */ (function (_super) {
@@ -76168,11 +76183,11 @@ var HexStateMachine = /** @class */ (function (_super) {
         }));
         _this.postIteration = function (machine, els) {
             var gn = 0;
-            machine.doEmitIteration(els);
             els.forEach(function (el) {
                 gn += el.cellState ? ((el.x * machine.gridWidth) + el.y) / machine.gridWidth : 0;
                 el.cellState = el.state.next;
             });
+            machine.doEmitIteration(els);
             machine.gridNumber = gn;
         };
         _this.renderers.add(new _lib_state_machine__WEBPACK_IMPORTED_MODULE_0___default.a.StateRenderer(machine, null, function (el) {
@@ -76309,26 +76324,16 @@ var GameOfLifeHex = /** @class */ (function () {
     function GameOfLifeHex(emerga) {
         singleton = this;
         this._emerga = emerga;
-        this.inited = false;
         this._globalCompositeOperation = 'luminosity';
-        this._gridWidth = 120;
-        this._gridHeight = 80;
+        this._gridWidth = 40;
+        this._gridHeight = 40;
         this._cellSize = jquery__WEBPACK_IMPORTED_MODULE_3___default()(window).width() / this._gridWidth;
-        this.stateMachine;
-        this._percentAlive = 8;
+        this._percentAlive = 15;
         this._ui = _ui__WEBPACK_IMPORTED_MODULE_1__["GameOfLifeHexUI"];
         this._scaleFactor = 512;
         this._complexityRestartThreshold = 0.1;
         this.zcnt = 0;
-        this._hex = Object(honeycomb_grid__WEBPACK_IMPORTED_MODULE_2__["extendHex"])({
-            size: 20,
-            orientation: 'flat'
-        }),
-            this._grid = Object(honeycomb_grid__WEBPACK_IMPORTED_MODULE_2__["defineGrid"])(this._hex),
-            this._gridElements = this._grid.rectangle({
-                width: this._gridWidth,
-                height: this._gridHeight
-            });
+        this._timer = 0;
         this.setupStateMachine();
     }
     Object.defineProperty(GameOfLifeHex.prototype, "ui", {
@@ -76396,70 +76401,63 @@ var GameOfLifeHex = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
-    /**
-     *
-     * @param {*} machine
-     * @param {*} els
-     */
     GameOfLifeHex.prototype.elementEmitted = function (machine, el) {
-        if (el.updated)
-            singleton.ui.addToRender(el);
-    };
-    GameOfLifeHex.prototype.iterationEmitted = function (machine, els) {
-        var _this = this;
         setTimeout(function () {
-            if (machine.rateOfChange < _this._complexityRestartThreshold) {
-                singleton.zcnt++;
-                if (singleton.zcnt === 10) {
-                    singleton.zcnt = 0;
-                    return singleton.restart();
-                }
+            var n = new Date().getMilliseconds();
+            if (singleton._timer === 0 || singleton._timer - n > 100) {
+                singleton.ui.showStatus('#00ff00ff');
+                singleton._timer = n;
             }
-            singleton.ui.addToRender(els);
         }, 0);
     };
-    /**
-     *
-     */
+    GameOfLifeHex.prototype.iterationEmitted = function (machine, els) {
+        if (machine.rateOfChange < this._complexityRestartThreshold) {
+            singleton.zcnt++;
+            if (singleton.zcnt === 10) {
+                singleton.zcnt = 0;
+                return singleton.restart();
+            }
+        }
+        singleton.ui.addToRender(els);
+        // singleton.stateMachine.elements.toArray().forEach((el:any) =>
+        //     singleton.ui.renderElement(el)
+        // );
+    };
     GameOfLifeHex.prototype.settingsUpdated = function () {
+        singleton.ui.clearCanvas();
         singleton.restart();
     };
-    /**
-     *
-     */
     GameOfLifeHex.prototype.setupStateMachine = function () {
         var smRules = null, machine = null;
+        this._hex = Object(honeycomb_grid__WEBPACK_IMPORTED_MODULE_2__["extendHex"])({
+            size: 20,
+            orientation: 'flat'
+        }),
+            this._grid = Object(honeycomb_grid__WEBPACK_IMPORTED_MODULE_2__["defineGrid"])(this._hex),
+            this._gridElements = this._grid.rectangle({
+                width: this._gridWidth,
+                height: this._gridHeight
+            });
         if (singleton.stateMachine)
             smRules = singleton.rules;
         singleton.stateMachine = machine = new _hex_state_machine__WEBPACK_IMPORTED_MODULE_0__["HexStateMachine"](this._gridElements, this._gridWidth, this._gridHeight, this._cellSize, this._percentAlive);
         if (smRules)
             machine.rules = smRules;
-        machine.onEmitElement = this.elementEmitted;
-        //machine.onEmitIteration = this.iterationEmitted
+        //machine.onEmitElement = this.elementEmitted
+        machine.onEmitIteration = this.iterationEmitted;
         machine.onEmitReset = this.settingsUpdated;
     };
-    /**
-     *
-     */
     GameOfLifeHex.prototype.restart = function () {
-        if (!singleton.inited)
-            return;
         if (singleton.stateMachine && !singleton.stateMachine.halted) {
             singleton.stateMachine.stop();
             singleton.setupStateMachine();
-            singleton.inited = true;
+            this.ui.run();
             singleton.stateMachine.run(-1);
         }
     };
-    /**
-     *
-     */
     GameOfLifeHex.prototype.init = function () {
         this.ui.init(this);
     };
-    /**
-     *
-     */
     GameOfLifeHex.prototype.run = function () {
         this.ui.run();
         singleton.stateMachine.run(-1);
@@ -76485,6 +76483,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _hex_state_machine__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./hex-state-machine */ "./src/scripts/game-of-life-hex-edition/hex-state-machine.ts");
+var __spreadArrays = (undefined && undefined.__spreadArrays) || function () {
+    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+    for (var r = Array(s), k = 0, i = 0; i < il; i++)
+        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+            r[k] = a[j];
+    return r;
+};
 
 
 var RenderingSettings = /** @class */ (function () {
@@ -76508,121 +76513,17 @@ var GameOfLifeHexUI;
 var GameOfLifeHexUIClass = /** @class */ (function () {
     function GameOfLifeHexUIClass(e) {
         var _this = this;
-        this.clearCanvas = function () {
-        };
-        this.initControls = function () {
-            var g = g = _this._app.emerga.guis['gui'];
-            var folder = g.addFolder('Starting Conditions');
-            folder.add(_this._app, 'percentAlive', 1, 99).step(1).onChange(_this._app.settingsUpdated());
-            folder.open();
-            var a = _this._app, rulesObj = a.stateMachine.rules, fr = folder.addFolder('Game of life Rules'), fonr = fr.addFolder('On State Rules'), foffr = fr.addFolder('Off State Rules');
-            fonr.add(rulesObj, 'On1').onChange(a.settingsUpdated());
-            fonr.add(rulesObj, 'On2').onChange(a.settingsUpdated());
-            fonr.add(rulesObj, 'On3').onChange(a.settingsUpdated());
-            fonr.add(rulesObj, 'On4').onChange(a.settingsUpdated());
-            fonr.add(rulesObj, 'On5').onChange(a.settingsUpdated());
-            fonr.add(rulesObj, 'On6').onChange(a.settingsUpdated());
-            foffr.add(rulesObj, 'Off1').onChange(a.settingsUpdated());
-            foffr.add(rulesObj, 'Off2').onChange(a.settingsUpdated());
-            foffr.add(rulesObj, 'Off3').onChange(a.settingsUpdated());
-            foffr.add(rulesObj, 'Off4').onChange(a.settingsUpdated());
-            foffr.add(rulesObj, 'Off5').onChange(a.settingsUpdated());
-            foffr.add(rulesObj, 'Off6').onChange(a.settingsUpdated());
-            fr.open();
-            fonr.open();
-            foffr.open();
-            folder = g.addFolder('Execution');
-            folder.add(a, 'complexityRestartThreshold', 0, 10).step(0.1).onChange(a.settingsUpdated());
-            folder.open();
-            g.remember(a);
-        };
-        this.initCanvas = function () {
-            var template = "\n        <style>\n            canvas {\n                width:100%;\n                height:100%\n            }\n            #wrapper {\n                width:100%;\n                height:100%\n            }\n        </style>\n        <div id=\"wrapper\">\n            <canvas width=\"1800\" height=\"1200 id=\"main\"></canvas>\n        </div>\n        ";
-            jquery__WEBPACK_IMPORTED_MODULE_0___default()(template).appendTo('body', function () {
-                _this._app.emerga.initCanvas('main');
-            });
-        };
-        this.initGrid = function () {
-            jquery__WEBPACK_IMPORTED_MODULE_0___default()('canvas').click(function (e) {
-                var x = e.clientX, y = e.clientY;
-                var hexCoordinates = _this._app._grid.pointToHex(x, y);
-                // do something
-            });
-        };
-        this.renderGrid = function () {
-            // render 10,000 hexes
-            _this._app._gridElements.forEach(function (hex) {
-                _this.renderElement(hex);
-            });
-        };
-        this.renderElement = function (hex) {
-            if (!hex) {
-                return;
-            }
-            var foreColor = '#000';
-            if (hex instanceof _hex_state_machine__WEBPACK_IMPORTED_MODULE_1__["HexCell"]) {
-                foreColor = hex.state.state ? '#fff' : '#333';
-                hex = hex.data;
-            }
-            var point = hex.toPoint();
-            var canvas = document.getElementById('main'), ctx;
-            if (canvas) {
-                ctx = canvas.getContext("2d");
-            }
-            if (ctx) {
-                ctx.beginPath();
-                ctx.arc(point.x, point.y, 20, 0, 2 * Math.PI);
-                ctx.fillStyle = foreColor;
-                ctx.fill();
-            }
-            // const _graphics:any = new PIXI.Graphics(),
-            // point = hex.toPoint(),
-            // corners = hex.corners().map((corner:any) => corner.add(point)),
-            // [firstCorner, ...otherCorners] = corners
-            // _graphics.lineStyle(1, foreColor)
-            // _graphics.moveTo(firstCorner.x, firstCorner.y)
-            // _graphics.beginFill('#fff', 1)
-            // otherCorners.forEach(({ x, y }:any) => _graphics.lineTo(x, y))
-            // _graphics.lineTo(firstCorner.x, firstCorner.y)
-            // _graphics.endFill()
-            // this._pixi.stage.addChild(
-            //     _graphics
-            // )
-        };
-        this.addToRender = function (el) {
-            _this.renderElement(el);
-            // if (Array.isArray(el)) {
-            //     this._elementsToRender = el
-            // } else {
-            //     this._elementsToRender.push(el)
-            // }
-        };
-        this.animate = function () {
-            var self = _this;
-            _this.clearCanvas();
-            var stats = _this.app.emerga.stats[0], _animate = function () {
-                stats.begin();
-                var el = self._elementsToRender.pop();
-                while (el) {
-                    self.renderElement(el);
-                    el = self._elementsToRender.pop();
-                }
-                stats.end();
-                requestAnimationFrame(_animate);
-            };
-            requestAnimationFrame(_animate);
-        };
         this.init = function (app) {
             _this._app = app;
             _this.initCanvas();
             _this._app.emerga
-                .initStats(0)
                 .initGUI('gui', {
                 load: JSON,
-                preset: 'Game of Life'
+                preset: 'Game of Life - in hex'
             });
             _this.initGrid();
             _this.initControls();
+            _this.renderGrid();
         };
         this._app = e;
         this._renderingSettings = new RenderingSettings(this);
@@ -76662,8 +76563,135 @@ var GameOfLifeHexUIClass = /** @class */ (function () {
     };
     GameOfLifeHexUIClass.prototype.resizeGraphArea = function () {
     };
+    GameOfLifeHexUIClass.prototype.clearCanvas = function () {
+        var e = this.app.emerga;
+        e.ctx.clearRect(0, 0, e.ctx.canvas.width, e.ctx.canvas.height);
+    };
+    GameOfLifeHexUIClass.prototype.initControls = function () {
+        var g = g = this._app.emerga.guis['gui'];
+        var folder = g.addFolder('Starting Conditions');
+        folder.add(this._app, 'percentAlive', 1, 99).step(1).onChange(this._app.settingsUpdated());
+        folder.open();
+        var a = this._app, rulesObj = a.stateMachine.rules, fr = folder.addFolder('Game of life Rules'), fonr = fr.addFolder('On State Rules'), foffr = fr.addFolder('Off State Rules');
+        fonr.add(rulesObj, 'On1').onChange(a.settingsUpdated());
+        fonr.add(rulesObj, 'On2').onChange(a.settingsUpdated());
+        fonr.add(rulesObj, 'On3').onChange(a.settingsUpdated());
+        fonr.add(rulesObj, 'On4').onChange(a.settingsUpdated());
+        fonr.add(rulesObj, 'On5').onChange(a.settingsUpdated());
+        fonr.add(rulesObj, 'On6').onChange(a.settingsUpdated());
+        foffr.add(rulesObj, 'Off1').onChange(a.settingsUpdated());
+        foffr.add(rulesObj, 'Off2').onChange(a.settingsUpdated());
+        foffr.add(rulesObj, 'Off3').onChange(a.settingsUpdated());
+        foffr.add(rulesObj, 'Off4').onChange(a.settingsUpdated());
+        foffr.add(rulesObj, 'Off5').onChange(a.settingsUpdated());
+        foffr.add(rulesObj, 'Off6').onChange(a.settingsUpdated());
+        fr.open();
+        fonr.open();
+        foffr.open();
+        folder = g.addFolder('Execution');
+        folder.add(a, 'complexityRestartThreshold', 0, 10).step(0.1).onChange(a.settingsUpdated());
+        folder.open();
+        g.remember(a);
+    };
+    GameOfLifeHexUIClass.prototype.initCanvas = function () {
+        var curCanv = document.getElementById('wrapper');
+        if (curCanv)
+            curCanv.parentNode.removeChild(curCanv);
+        var container = document.createElement('div');
+        container.id = 'wrapper';
+        document.body.appendChild(container);
+        var canv = document.createElement('canvas');
+        canv.id = 'main';
+        canv.width = '1800';
+        canv.height = '1200';
+        container.appendChild(canv);
+        this.app.emerga.initCanvas('main');
+    };
+    GameOfLifeHexUIClass.prototype.initGrid = function () {
+        var _this = this;
+        jquery__WEBPACK_IMPORTED_MODULE_0___default()('canvas').click(function (e) {
+            var x = e.clientX, y = e.clientY;
+            var hexCoordinates = _this._app._grid.pointToHex(x, y);
+            // do something
+        });
+    };
+    GameOfLifeHexUIClass.prototype.showStatus = function (color) {
+        GameOfLifeHexUI._showStatus = true;
+        GameOfLifeHexUI._showStatusColor = color;
+    };
+    GameOfLifeHexUIClass.prototype.renderStatus = function (color) {
+        var _this = this;
+        var circleC = function (c) {
+            var ctx = _this.app.emerga.ctx;
+            ctx.beginPath();
+            ctx.fillStyle = c;
+            ctx.strokeStyle = '##222';
+            ctx.arc(30, 30, 10, 0, 2 * Math.PI, false);
+            ctx.lineWidth = 1;
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+        };
+        circleC(color);
+        //setTimeout(() => circleC('#333'), 100)
+    };
+    GameOfLifeHexUIClass.prototype.renderGrid = function () {
+        this.addToRender(this._app._gridElements);
+    };
+    GameOfLifeHexUIClass.prototype.renderElement = function (hex) {
+        if (!hex) {
+            return;
+        }
+        var foreColor = '#000', strokeColor = '#222';
+        if (hex instanceof _hex_state_machine__WEBPACK_IMPORTED_MODULE_1__["HexCell"]) {
+            foreColor = hex.state.state === true ? '#ffffffff' : '##000000ff';
+            if (hex.updated)
+                strokeColor = '#ff00ffff';
+            hex = hex.data;
+        }
+        var point = hex.toPoint();
+        var ctx = this.app.emerga.ctx;
+        if (ctx) {
+            var point_1 = hex.toPoint(), corners_1 = hex.corners().map(function (corner) { return corner.add(point_1); }), drawHexagon = function (c) {
+                ctx.beginPath();
+                ctx.fillStyle = foreColor;
+                ctx.strokeStyle = strokeColor;
+                ctx.moveTo(corners_1[0].x, corners_1[0].y);
+                ctx.lineTo(corners_1[1].x, corners_1[1].y);
+                ctx.lineTo(corners_1[2].x, corners_1[2].y);
+                ctx.lineTo(corners_1[3].x, corners_1[3].y);
+                ctx.lineTo(corners_1[4].x, corners_1[4].y);
+                ctx.lineTo(corners_1[5].x, corners_1[5].y);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+            };
+            drawHexagon(strokeColor);
+            //setTimeout(() => drawHexagon('#ccccccff'), 100)
+        }
+    };
+    GameOfLifeHexUIClass.prototype.addToRender = function (el) {
+        if (Array.isArray(el)) {
+            if (GameOfLifeHexUI._elementsToRender.length > 0)
+                console.log("draw queue not empty: " + GameOfLifeHexUI._elementsToRender.length);
+            GameOfLifeHexUI._elementsToRender = GameOfLifeHexUI._elementsToRender.concat(el);
+        }
+        else {
+            GameOfLifeHexUI._elementsToRender.push(el);
+        }
+    };
+    GameOfLifeHexUIClass.prototype.animate = function () {
+        var _animate = function (ar) {
+            while (ar.length > 0)
+                GameOfLifeHexUI.renderElement(ar.shift());
+            requestAnimationFrame(function () { return GameOfLifeHexUI.animate(); });
+        };
+        var rarr = __spreadArrays(GameOfLifeHexUI._elementsToRender);
+        GameOfLifeHexUI._elementsToRender = [];
+        requestAnimationFrame(function () { return _animate(rarr); });
+    };
     GameOfLifeHexUIClass.prototype.run = function () {
-        this.renderGrid();
+        this.animate();
     };
     return GameOfLifeHexUIClass;
 }());
@@ -76720,12 +76748,6 @@ var GameOfLife = /*#__PURE__*/function () {
 
   _createClass(GameOfLife, [{
     key: "iterationEmitted",
-
-    /**
-     * 
-     * @param {*} machine 
-     * @param {*} els 
-     */
     value: function iterationEmitted(machine, els) {
       var _this = this;
 
@@ -76742,19 +76764,18 @@ var GameOfLife = /*#__PURE__*/function () {
         singleton.ui.addToRender(els);
       }, 0);
     }
-    /**
-     * 
-     */
-
+  }, {
+    key: "elementEmitted",
+    value: function elementEmitted(machine, el) {
+      setTimeout(function () {
+        return singleton.ui.renderElement(el);
+      }, 0);
+    }
   }, {
     key: "settingsUpdated",
     value: function settingsUpdated() {
       singleton.restart();
     }
-    /**
-     * 
-     */
-
   }, {
     key: "setupStateMachine",
     value: function setupStateMachine() {
@@ -76770,10 +76791,6 @@ var GameOfLife = /*#__PURE__*/function () {
       machine.onEmitIteration = this.iterationEmitted;
       machine.onEmitReset = this.settingsUpdated;
     }
-    /**
-     * 
-     */
-
   }, {
     key: "restart",
     value: function restart() {
@@ -76786,10 +76803,6 @@ var GameOfLife = /*#__PURE__*/function () {
         singleton.stateMachine.run(-1);
       }
     }
-    /**
-     * 
-     */
-
   }, {
     key: "init",
     value: function init() {
@@ -76806,10 +76819,6 @@ var GameOfLife = /*#__PURE__*/function () {
         self.settingsUpdated();
       });
     }
-    /**
-     * 
-     */
-
   }, {
     key: "run",
     value: function run() {
@@ -77023,8 +77032,7 @@ var renderElement = function renderElement(app, el) {
   var ctx = app.emerga.context;
   var x = el.x * app.cellSize,
       y = el.y * app.cellSize,
-      color = el.cellState ? 'rgba(255,255,255,1)' : 'rgba(0,0,0,1)'; //ctx.globalCompositeOperation = app.globalCompositeOperation;
-
+      color = el.cellState ? 'rgba(255,255,255,1)' : 'rgba(0,0,0,1)';
   ctx.fillStyle = color;
   ctx.fillRect(x, y, app.cellSize, app.cellSize);
   ctx.lineWidth = 2;
@@ -77055,7 +77063,6 @@ var animate = function animate(app) {
   clearCanvas(app);
 
   var _animate = function _animate() {
-    app.emerga.stats[0].begin();
     var el = elementsToRender.pop();
 
     while (el) {
@@ -77063,7 +77070,6 @@ var animate = function animate(app) {
       el = elementsToRender.pop();
     }
 
-    app.emerga.stats[0].end();
     requestAnimationFrame(_animate);
   };
 
