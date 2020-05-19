@@ -75976,7 +75976,7 @@ var HexCell = /** @class */ (function (_super) {
     HexCell.advance = function (el) {
         var nextState = el.nextState();
         var updated = el.cellState !== nextState;
-        el.state.next = nextState;
+        el.cellState = nextState;
         el.updated = updated;
         return [el];
     };
@@ -76160,6 +76160,7 @@ var HexStateMachine = /** @class */ (function (_super) {
         _this._percentAlive = percentAlive;
         _this._onEmitElement = null;
         _this._onEmitIteration = null;
+        _this._onEmitComplete = null;
         _this._onEmitReset = null;
         _this._rules = new HexStateMachineRules(_this);
         _this.gridNumbers = [];
@@ -76185,10 +76186,13 @@ var HexStateMachine = /** @class */ (function (_super) {
             var gn = 0;
             els.forEach(function (el) {
                 gn += el.cellState ? ((el.x * machine.gridWidth) + el.y) / machine.gridWidth : 0;
+                el.updated = el.cellState != el.state.next;
                 el.cellState = el.state.next;
             });
-            machine.doEmitIteration(els);
             machine.gridNumber = gn;
+            machine.doEmitIteration(els);
+            if (machine.remIterations === 0)
+                machine.doEmitComplete(els);
         };
         _this.renderers.add(new _lib_state_machine__WEBPACK_IMPORTED_MODULE_0___default.a.StateRenderer(machine, null, function (el) {
             return machine.doEmitElement(el);
@@ -76264,6 +76268,12 @@ var HexStateMachine = /** @class */ (function (_super) {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(HexStateMachine.prototype, "onEmitComplete", {
+        get: function () { return this._onEmitComplete; },
+        set: function (v) { this._onEmitComplete = v; },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(HexStateMachine.prototype, "onEmitReset", {
         get: function () { return this._onEmitReset; },
         set: function (v) { this._onEmitReset = v; },
@@ -76284,6 +76294,10 @@ var HexStateMachine = /** @class */ (function (_super) {
     HexStateMachine.prototype.doEmitIteration = function (els) {
         if (singleton.onEmitIteration)
             singleton.onEmitIteration(singleton, els);
+    };
+    HexStateMachine.prototype.doEmitComplete = function (els) {
+        if (singleton.onEmitComplete)
+            singleton.onEmitComplete(singleton, els);
     };
     HexStateMachine.prototype.doEmitReset = function () {
         if (singleton.onEmitReset)
@@ -76401,16 +76415,7 @@ var GameOfLifeHex = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
-    GameOfLifeHex.prototype.elementEmitted = function (machine, el) {
-        setTimeout(function () {
-            var n = new Date().getMilliseconds();
-            if (singleton._timer === 0 || singleton._timer - n > 100) {
-                singleton.ui.showStatus('#00ff00ff');
-                singleton._timer = n;
-            }
-        }, 0);
-    };
-    GameOfLifeHex.prototype.iterationEmitted = function (machine, els) {
+    GameOfLifeHex.prototype.iterationCompleted = function (machine, els) {
         if (machine.rateOfChange < this._complexityRestartThreshold) {
             singleton.zcnt++;
             if (singleton.zcnt === 10) {
@@ -76418,10 +76423,10 @@ var GameOfLifeHex = /** @class */ (function () {
                 return singleton.restart();
             }
         }
-        singleton.ui.addToRender(els);
-        // singleton.stateMachine.elements.toArray().forEach((el:any) =>
-        //     singleton.ui.renderElement(el)
-        // );
+        setTimeout(function () {
+            singleton.ui.addToRender(els);
+            singleton.stateMachine.run(1);
+        }, 0);
     };
     GameOfLifeHex.prototype.settingsUpdated = function () {
         singleton.ui.clearCanvas();
@@ -76443,16 +76448,14 @@ var GameOfLifeHex = /** @class */ (function () {
         singleton.stateMachine = machine = new _hex_state_machine__WEBPACK_IMPORTED_MODULE_0__["HexStateMachine"](this._gridElements, this._gridWidth, this._gridHeight, this._cellSize, this._percentAlive);
         if (smRules)
             machine.rules = smRules;
-        //machine.onEmitElement = this.elementEmitted
-        machine.onEmitIteration = this.iterationEmitted;
+        machine.onEmitComplete = this.iterationCompleted;
         machine.onEmitReset = this.settingsUpdated;
     };
     GameOfLifeHex.prototype.restart = function () {
         if (singleton.stateMachine && !singleton.stateMachine.halted) {
             singleton.stateMachine.stop();
             singleton.setupStateMachine();
-            this.ui.run();
-            singleton.stateMachine.run(-1);
+            singleton.run();
         }
     };
     GameOfLifeHex.prototype.init = function () {
@@ -76460,7 +76463,7 @@ var GameOfLifeHex = /** @class */ (function () {
     };
     GameOfLifeHex.prototype.run = function () {
         this.ui.run();
-        singleton.stateMachine.run(-1);
+        this.stateMachine.run(1);
     };
     return GameOfLifeHex;
 }());
@@ -76538,16 +76541,6 @@ var GameOfLifeHexUIClass = /** @class */ (function () {
         },
         set: function (v) {
             this._app = v;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(GameOfLifeHexUIClass.prototype, "onUpdated", {
-        get: function () {
-            return this._onUpdated;
-        },
-        set: function (s) {
-            this._onUpdated = s;
         },
         enumerable: true,
         configurable: true
@@ -76644,9 +76637,9 @@ var GameOfLifeHexUIClass = /** @class */ (function () {
         }
         var foreColor = '#000', strokeColor = '#222';
         if (hex instanceof _hex_state_machine__WEBPACK_IMPORTED_MODULE_1__["HexCell"]) {
-            foreColor = hex.state.state === true ? '#ffffffff' : '##000000ff';
-            if (hex.updated)
-                strokeColor = '#ff00ffff';
+            // if(!hex.updated) return
+            foreColor = hex.cellState === true ? '#ffffffff' : '##000000ff';
+            strokeColor = '#ff00ffff';
             hex = hex.data;
         }
         var point = hex.toPoint();
