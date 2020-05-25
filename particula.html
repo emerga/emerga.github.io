@@ -23,69 +23,6 @@
         vertical-align: text-bottom;
     }
     
-    .sidebar {
-        position: fixed;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        z-index: 100;
-        /* Behind the navbar */
-        padding: 0;
-        box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
-    }
-    
-    .sidebar-sticky {
-        position: -webkit-sticky;
-        position: sticky;
-        top: 48px;
-        height: calc(100vh - 48px);
-        padding-top: .5rem;
-        overflow-x: hidden;
-        overflow-y: auto;
-    }
-    
-    .sidebar .nav-link {
-        font-weight: 500;
-        color: #333;
-    }
-    
-    .sidebar .nav-link .feather {
-        margin-right: 4px;
-        color: #999;
-    }
-    
-    .sidebar .nav-link.active {
-        color: #007bff;
-    }
-    
-    .sidebar .nav-link:hover .feather,
-    .sidebar .nav-link.active .feather {
-        color: inherit;
-    }
-    
-    .sidebar-heading {
-        font-size: .75rem;
-        text-transform: uppercase;
-    }
-    
-    .graph-data-sidebar {
-        margin-top: 50px;
-    }
-    
-    .navbar-brand {
-        padding-top: .75rem;
-        padding-bottom: .75rem;
-        font-size: 1rem;
-        background-color: rgba(0, 0, 0, .25);
-        box-shadow: inset -1px 0 0 rgba(0, 0, 0, .25);
-    }
-    
-    .navbar .form-control {
-        padding: .75rem 1rem;
-        border-width: 0;
-        border-radius: 0;
-    }
-    
     .form-control-dark {
         color: #fff;
         background-color: rgba(255, 255, 255, .1);
@@ -127,7 +64,7 @@
     
     #particula {
         width: 100%;
-        height: 800px;
+        height: 1000px;
         color: #999;
     }
     
@@ -207,33 +144,75 @@
     .cyan {
         background-color: cyan;
     }
+    
+    .dg.main.taller-than-window .close-button {
+        border-top: 1px solid #ddd;
+    }
+    
+    .dg.main .close-button {
+        background-color: #ccc;
+    }
+    
+    .dg.main .close-button:hover {
+        background-color: #ddd;
+    }
+    
+    .dg {
+        color: #555;
+        text-shadow: none !important;
+    }
+    
+    .dg.main::-webkit-scrollbar {
+        background: #fafafa;
+    }
+    
+    .dg.main::-webkit-scrollbar-thumb {
+        background: #bbb;
+    }
+    
+    .dg li:not(.folder) {
+        background: #fafafa;
+        border-bottom: 1px solid #ddd;
+    }
+    
+    .dg li.save-row .button {
+        text-shadow: none !important;
+    }
+    
+    .dg li.title {
+        background: #e8e8e8 url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlI+hKgFxoCgAOw==) 6px 10px no-repeat;
+    }
+    
+    .dg .cr.function:hover,
+    .dg .cr.boolean:hover {
+        background: #fff;
+    }
+    
+    .dg .c input[type=text] {
+        background: #e9e9e9;
+    }
+    
+    .dg .c input[type=text]:hover {
+        background: #eee;
+    }
+    
+    .dg .c input[type=text]:focus {
+        background: #eee;
+        color: #555;
+    }
+    
+    .dg .c .slider {
+        background: #e9e9e9;
+    }
+    
+    .dg .c .slider:hover {
+        background: #eee;
+    }
 </style>
-<!-- navigation -->
-<nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 top-nav">
-    <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">the Omega Cell</a>
-    <span class="num-iterations">0</span> iterations</span>
-</nav>
 <!-- body container -->
 <div class="container-fluid">
     <!-- container row -->
     <div class="row">
-        <!-- container left navigation -->
-        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
-            <div class="sidebar-sticky">
-                <ul class="nav flex-column mb-2">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <span data-feather="file-text"></span> .
-                        </a>
-                    </li>
-                </ul>
-                <!-- container left navigation - output data-->
-                <h6 class="no sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-                    <h5>Particula Playground</h6>
-                Particula is a playground for experimenting with a particle-based cellular automata which shows some fascinating life-like emergent behavior, including self-organization into cell-like entities, reproduction a kind of metabolism, and other features. click
-                on the play ('>>') button to make it go, pause ('||') to pause, advance ('>') to step one time step forward, or restart ('X') to restart the simulation. Use the Settings tab to control simulation settings.
-                <pre id="node-output" class="d-flex"></pre>
-        </nav>
 
         <!-- container main content area -->
         <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
@@ -248,37 +227,14 @@
                 </div>
             </div>
 
-            <div id="particula"></div>
-
-            <!-- tab control pills -->
-            <div class="table-responsive control-tabs">
-                <ul id="controltabs" role="tablist" class="nav nav-pills">
-                    <li class="nav-item active">
-                        <a class="nav-link active" href="#input" id="input-tab" data-toggle="pill" role="tab">input</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#settings" id="settings-tab" data-toggle="pill" role="tab">settings</a>
-                    </li>
-                </ul>
-            </div>
-
-            <!-- tab content area -->
-            <div class="input-data tab-content bodycolor">
-                <!-- tab content area - input tab -->
-                <div class="tab-pane active" id="input" role="tabpanel"></div>
-                <!-- tab content area - settings tab -->
-                <div class="tab-pane" data-toggle="tab" id="settings" role="tabpanel"></div>
-            </div>
-
             <!-- control bar -->
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
                     <span class="input-group-text" id="basic-addon1">max: </span>
                 </div>
                 <!-- iteration control -->
-                <input type="text" class="form-control" id="num-iterations-input" placeholder="1">
+                <input type="text" class="form-control" id="num-iterations-input" placeholder="1" />
                 <span class="iterations-output num-iterations" id="control-status-label">x</span>
-                </span>
                 <!-- iteration buttons -->
                 <div class="btn-group top-btn" role="group">
                     <button type="button" id="btn-advance" class="btn btn-success">></button>
@@ -291,6 +247,7 @@
                     <span class="input-group-text alert-success" id="quick-status">Ready</span>
                 </div>
             </div>
+
+            <div id="particula"></div>
         </main>
-        </div>
     </div>
