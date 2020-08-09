@@ -1,0 +1,1 @@
+{"version":3,"sources":["src/page/index/index.scss"],"names":[],"mappings":"AAAA,UAGE,QAAS,CACT,SAAU,CAGZ,qBANE,UAAW,CACX,WAOY,CAGd,KACE,UAAW","file":"index.29f5d76c.css","sourceRoot":"..","sourcesContent":["html, body {\n  width: 100%;\n  height: auto;\n  margin: 0;\n  padding: 0;\n}\n\n.component {\n  width: 100%;\n  height: auto;\n}\n\n.row {\n  width: 100%;\n}\n"]}
