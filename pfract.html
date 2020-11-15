@@ -1,0 +1,84 @@
+
+
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>Fractalz</title>
+  <style>
+    body {
+        margin:0;
+        padding:0;
+        overflow:hidden;
+        background-color:#888;
+      }
+      canvas {
+        display:block;
+      }
+  </style>
+</head>
+
+<body translate="no">
+
+<script src='https://pixijs.download/v4.7.0/pixi.min.js'></script>
+<script src='https://mrdoob.github.io/stats.js/build/stats.min.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/dat.gui@0.7.7/build/dat.gui.min.js'></script>
+<script src='https://unpkg.com/color-scheme-js@1.0.6/lib/color-scheme.js'></script>
+<script src='./pfract.js'></script>
+
+<script>
+
+  var pxi;
+  const createPIXI = (initcb, resizecb) => {
+    pxi = window.pxi = new PIXI.Application({
+      autoResize: true,
+      resolution: devicePixelRatio 
+    });
+    document.body.appendChild(pxi.view);
+    function resize() {
+      pxi.renderer.resize(window.innerWidth, window.innerHeight);
+      resizecb();
+    }
+    window.addEventListener('resize', resize);
+    initcb();
+    resize();
+  }
+  
+  var foreground;
+  function initForeground() {
+    if(foreground) {
+      clearCanvas();
+    }
+    foreground = new PIXI.Container();
+    foreground.width = pxi.stage.width;
+    foreground.height = pxi.stage.height;
+    foreground.x = pxi.stage.width / 2;
+    foreground.y = pxi.stage.height / 2;
+    pxi.stage.addChild(foreground)
+  }
+
+  const clearCanvas = () => {
+    for (var i = foreground.children.length - 1; i >= 0; i--) {
+      foreground.removeChild(foreground.children[i]);
+    };
+  };
+
+  var rect;
+  createPIXI(() => {
+    initForeground();
+    initControls(stateMachine.rules);
+    setupStateMachine(() => {
+      clearCanvas();
+    });
+    stateMachine.run(stateMachine.rules.numIterations);
+  },
+  () => {
+    foreground.position.set(pxi.screen.width / 2, pxi.screen.height / 2);
+  })
+
+
+</script>
+
+</body>
+
+
