@@ -124,6 +124,8 @@ class StateRenderer extends StateElement {
         }
     }
 }
+var tick1 = 0;
+
 /**
  * 
  */
@@ -141,7 +143,7 @@ class StateMachine {
         this.maxIterations = 10;
         this.halt = false;
         this.pause = false;
-        this._cadence = 100
+        this._cadence = 100;
         this.throttle = 1000;
 
         this._asyncCompute = false;
@@ -250,15 +252,24 @@ class StateMachine {
             this.remIterations = this.remIterations > 0 ?
                 this.remIterations - 1 :
                 this.remIterations;
-            return setTimeout(() => machine._advance(), this.cadence);
+                tick1++;
+            if(tick1 > 50) {
+                tick1 = 0;
+                return setTimeout(() => machine._advance(), 0);
+            } else Promise.resolve().then(() => machine._advance())
         }
         const curElement = this.curElements.pop();
         const els = this.operateOnElement(curElement);
         this.renderElement(curElement);
         this.newElements = this.newElements.concat(els);
-        setTimeout(() => machine.processElement(),0)
-        //Promise.resolve().then(() => machine.processElement());
+
+        tick1++;
+        if(tick1 > 50) {
+            tick1 = 0;
+            setTimeout(() => machine.processElement(),1);
+        } else  Promise.resolve().then(() => machine.processElement());
     }
+    
 
     processElementAsync() {
         var machine = this;
@@ -274,7 +285,12 @@ class StateMachine {
             this.remIterations = this.remIterations > 0 ?
                 this.remIterations - 1 :
                 this.remIterations;
-            return setTimeout(() => machine._advance(), this.cadence);
+                tick1++;
+            if(tick1 > 50) {
+                tick1 = 0;
+                return setTimeout(() => machine._advance(), this.cadence);
+            } else Promise.resolve().then(() => machine._advance())
+            
         }
         const curElement = this.curElements.pop();
         setTimeout(() => {
@@ -381,20 +397,20 @@ class GenerativeStateMachineRules {
         this._skewAngle = 0;
         this._twistFactor = 0;
         this._segmentStartIndex = 1;
-        this._numIterations = 8;
+        this._numIterations = 5;
         this._asyncRender = false;
-        this._scaleFactor = 0.1;
+        this._scaleFactor = 1.5;
         this._offset = 0;
         this._usePoints = false;
         this._useLines = true;
         this._squared = true;
         this._pointScale = 16;
         this._variablePointSize = false;
-        this._variableLineThickness = true;
+        this._variableLineThickness = false;
         this._variableOpacity = true;
         this._lineThickness = 1;
         this._sceneOpacity = 1;
-        this._colorHue = 112;
+        this._colorHue = 0;
         this._globalCompositeOperation = 'darker';
         this._animationProperty = '_branchAngle';
         this._animationStart = 0
@@ -646,7 +662,7 @@ const initControls = (app) => {
     folder.open();
     g.remember(window.fractalOfLife);
     folder = g.addFolder('Scaling');
-    folder.add(app, 'scaleFactor', 0.1, 5.0).onChange(() => app.settingsUpdated());
+    folder.add(app, 'scaleFactor', 0.1, 5.0).onChange(() => app.scalingUpdated());
     folder.addColor(app.backgroundColor, 'color');
     folder.add(app, 'backgroundColor', () => { app.backgroundColor.updated()});  
     folder.open();
@@ -719,20 +735,19 @@ const rendeEl = (app, el) => {
     var varThick = cb.squared ? iter * iter : iter;
     strokeWidth = cb.variableLineThickness ?
         (cb.lineThickness / varThick) :
-        cb.lineThickness;
+        1 / cb.lineThickness;
 
     function random_rgba(a,s,t,u) { return '#ffffe8ff'/**/ }
     var strokeStyle = '#' + colors[iter]; //random_rgba(255 / iter, 255 / iter, 255 / iter, 255 / iter);
     var pointSize =
         cb.variablePointSize ?
-        256 / (varThick * cb.pointScale) : cb.pointScale;
+        (256 * cb.scaleFactor) / (varThick * cb.pointScale) : cb.pointScale;
     var drawLine = (start, end) => {
         if (cb.useLines) {
             const line = two.makeLine(start[0], start[1], end[0], end[1]);
             line.fill = strokeStyle;
             line.stroke = strokeStyle;
-            line.lineThickness = strokeWidth;
-            line.lineWidth = strokeWidth;
+            if(cb.variableLineThickness) line.linewidth = strokeWidth * cb.pointScale;
             if(cb.variableOpacity) {
                 line.opacity = 1 / varThick;
             }
@@ -751,7 +766,7 @@ const rendeEl = (app, el) => {
             if(cb.variableOpacity) {
                 circle.opacity = 1 / varThick;
             }
-            foreground.add(circle);
+            foreground.add(circle);/*
             circle = two.makeCircle(end[0], end[1], pointSize);
             circle.fill = strokeStyle;
             circle.stroke = strokeStyle;
@@ -761,15 +776,15 @@ const rendeEl = (app, el) => {
             if(cb.variableOpacity) {
                 circle.opacity = 1 / varThick;
             }
-            foreground.add(circle);
+            foreground.add(circle);*/
         }
     };
     if (stateMachine.halted) {
         return clearCanvas(app);
     }
-    var originCoords = offset(el.origin(256), cb.offset);
+    var originCoords = offset(el.origin(256* cb.scaleFactor), cb.offset);
     el.children.forEach((child) => {
-        var childCoords = offset(child.origin(256), cb.offset);
+        var childCoords = offset(child.origin(256* cb.scaleFactor), cb.offset);
         drawLine(originCoords, childCoords);
     });
 };
@@ -804,7 +819,7 @@ var colors;
 
 const setupStateMachine= () => {
     var scheme = new ColorScheme;
-    scheme.from_hue(stateMachine.rules.colorHue)         
+    scheme.from_hue(stateMachine.rules.colorHue * stateMachine.rules.scaleFactor)         
             .scheme('tetrade')   
             .variation('hard');
     colors = scheme.colors();
@@ -819,9 +834,13 @@ const setupStateMachine= () => {
   if (smRules) { stateMachine.rules = smRules; }
   stateMachine.asyncCompute = smRules.asyncRender;
   stateMachine.onEmitElement = (machine, el) => { 
+    //renderElement(el)
+      //setTimeout(() => renderElement(el), 0)
+  };
+  stateMachine.onEmitIteration = (machine, el) => { 
     renderElement(el)
       //setTimeout(() => renderElement(el), 0)
-    };
+  };
   stateMachine.onEmitReset = (machine, el) => {
     stateMachine.stop();
     two.remove(foreground);
@@ -849,23 +868,8 @@ two
 }).play();
 
 
-setInterval(() => {
-  if(!stateMachine.rules.animationAnimate) return;  
-  if(!dir) {
-    scale += interval;
-    if(scale > 3) {
-       dir = !dir;
-     }
-     } else {
-     scale -= interval;
-     if(scale < scale) {
-       dir = !dir;
-     }
-   }
-   foreground.scale = scale;
- }, 100);
 
- foreground.scale = 0.1;
+ //foreground.scale = 0.1;
     </script>
 
   
