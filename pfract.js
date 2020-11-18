@@ -299,16 +299,16 @@
            this._skewAngle = 0;
            this._twistFactor = 0;
            this._segmentStartIndex = 1;
-           this._numIterations = 5;
+           this._numIterations = 3;
            this._asyncRender = false;
            this._scaleFactor = 1;
            this._offset = 0;
-           this._usePoints = false;
+           this._usePoints = true;
            this._useLines = true;
            this._squared = true;
-           this._pointScale = 16;
-           this._variablePointSize = false;
-           this._variableLineThickness = false;
+           this._pointScale =3;
+           this._variablePointSize = true;
+           this._variableLineThickness = true;
            this._variableOpacity = true;
            this._lineThickness = 1;
            this._sceneOpacity = 1;
@@ -504,7 +504,7 @@
    const initControls = (pxi_app) => {
        g = new this.dat.GUI()
        var folder = g.addFolder('Starting Conditions');
-       folder.add(pxi_app, 'segments').min(2).step(1).onChange(pxi_app.settingsUpdated());
+       folder.add(pxi_app, 'segments').min(1).step(1).onChange(pxi_app.settingsUpdated());
        folder.add(pxi_app, 'numIterations').min(1).step(1).onChange(pxi_app.settingsUpdated());
        folder.add(pxi_app, 'branchAngle', 1, 359).onChange(pxi_app.settingsUpdated());
        folder.add(pxi_app, 'twistFactor', -10, 10).onChange(pxi_app.settingsUpdated());
