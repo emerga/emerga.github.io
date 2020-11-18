@@ -68,7 +68,7 @@ canvas[buffer] {
       this.colorIndex = 0;
       this.modes = ['rotateall', 'rotate', 'opacity', 'color', 'iterations', 'faces', 'shapes', 'zoom'];
       this.shapes = ['polygons', 'lines', 'ballines'];
-      this.shapeIndex = 2;
+      this.shapeIndex = 1;
       this.fadeText = new PointText(view.center);
       this.statusText = new PointText(new Point(140, 40));
       this.debounce = {}
@@ -152,7 +152,7 @@ canvas[buffer] {
               if(dir > 0) { self.iterations = self.iterations + 1 } 
               else { self.iterations = self.iterations - 1 }
               if( self.iterations < 1) { self.iterations = 1; }
-              if( self.iterations > 5) { self.iterations = 5; }
+              if( self.iterations > 8) { self.iterations = 8; }
               if( self.iterations > 3 && self.rootNumber > 6 ) {
                 self.iterations = 2;
               }
@@ -281,7 +281,7 @@ canvas[buffer] {
     
       function iterate(iter, ndx, pos) {
           var ret = [], it = iter === 0 ? 1 : iter
-          var opa = 1 / ( it * it * self.options.opacity)
+          var opa = 1 / ( it * (it/2) * self.options.opacity)
           var cc = getPolyColor(iter, ndx);
           var shape = self.shapes[self.shapeIndex];
           var polytope = new Path.RegularPolygon({
@@ -351,6 +351,7 @@ canvas[buffer] {
         self.group.position.x = view.center.x;
         self.group.position.y = view.center.y;
         self.group.opacity = self.options.opacity        
+        self.group.scale(self.options.scale)
       }
       buildElements() 
 
@@ -366,15 +367,18 @@ canvas[buffer] {
             self.statusText.opacity = self.statusText.opacity - 0.01;
           }
         }
+        self.elements.forEach(function(el) {
+          el.rotate(0.3 * (el.polytopia.iteration));
+        })
       }
   }
   
 
   var ft;
-  if(!ft)ft = new Fractope(5, 128, 2, {
+  if(!ft)ft = new Fractope(3, 128, 4, {
     rotate: 0,
-    opacity: 0.7,
-    scale: 1.5
+    opacity: 1,
+    scale: 1.8
   });
 
 
