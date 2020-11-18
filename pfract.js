@@ -688,11 +688,13 @@
            }
        };
        if (stateMachine.halted) { return clearCanvas(pxi_app); }
-       var originCoords = offset(el.origin(256 * cb.scaleFactor), 256 * cb.scaleFactor);
-       el.children.forEach((child) => {
-           var childCoords = offset(child.origin(256 * cb.scaleFactor), 256 * cb.scaleFactor);
-           drawLine(originCoords, childCoords);
-       });
+       if(iter < 100) {
+            var originCoords = offset(el.origin(256 * cb.scaleFactor), 256 * cb.scaleFactor);
+            el.children.forEach((child) => {
+                var childCoords = offset(child.origin(256 * cb.scaleFactor), 256 * cb.scaleFactor);
+                drawLine(originCoords, childCoords);
+            });
+       }
    };
 
    const renderElement = (el) => {

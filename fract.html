@@ -397,7 +397,7 @@ class GenerativeStateMachineRules {
         this._skewAngle = 0;
         this._twistFactor = 0;
         this._segmentStartIndex = 1;
-        this._numIterations = 5;
+        this._numIterations = 3;
         this._asyncRender = false;
         this._scaleFactor = 1.5;
         this._offset = 0;
@@ -594,7 +594,7 @@ class GenerativeStateMachineRules {
 const initControls = (app) => {
     g = new this.dat.GUI()
     var folder = g.addFolder('Starting Conditions');
-    folder.add(app, 'segments').min(2).step(1).onChange(app.settingsUpdated());
+    folder.add(app, 'segments').min(1).step(1).onChange(app.settingsUpdated());
     folder.add(app, 'numIterations').min(1).step(1).onChange(app.settingsUpdated());
     folder.add(app, 'branchAngle', 1, 359).onChange(app.settingsUpdated());
     folder.add(app, 'twistFactor', -10, 10).onChange(app.settingsUpdated());
@@ -737,8 +737,7 @@ const rendeEl = (app, el) => {
         (cb.lineThickness / varThick) :
         1 / cb.lineThickness;
 
-    function random_rgba(a,s,t,u) { return '#ffffe8ff'/**/ }
-    var strokeStyle = '#' + colors[iter]; //random_rgba(255 / iter, 255 / iter, 255 / iter, 255 / iter);
+    var strokeStyle = '#' + colors[iter];
     var pointSize =
         cb.variablePointSize ?
         (256 * cb.scaleFactor) / (varThick * cb.pointScale) : cb.pointScale;
@@ -782,11 +781,23 @@ const rendeEl = (app, el) => {
     if (stateMachine.halted) {
         return clearCanvas(app);
     }
-    var originCoords = offset(el.origin(256* cb.scaleFactor), cb.offset);
-    el.children.forEach((child) => {
-        var childCoords = offset(child.origin(256* cb.scaleFactor), cb.offset);
-        drawLine(originCoords, childCoords);
-    });
+    if(iter < 100) {
+        var originCoords = offset(el.origin(256* cb.scaleFactor), cb.offset);
+        el.children.forEach((child) => {
+            var childCoords = offset(child.origin(256* cb.scaleFactor), cb.offset);
+            drawLine(originCoords, childCoords);
+        });
+    } else {
+        var originCoords = offset(el.origin(256* cb.scaleFactor), cb.offset);
+        el.children.forEach((child) => {
+            var childCoords = offset(child.origin(256* cb.scaleFactor), cb.offset);
+            var clonedScene = foreground.clone();
+            clonedScene.scale = 1 / varThick;
+            clonedScene.x = childCoords[0];
+            clonedScene.y = childCoords[1];
+            foreground.add(clonedScene);
+        });       
+    }
 };
 
 const renderElement = (el) => {
@@ -823,9 +834,19 @@ const setupStateMachine= () => {
             .scheme('tetrade')   
             .variation('hard');
     colors = scheme.colors();
+    var cb = stateMachine.rules;
+    var strokeStyle = '#' + colors[0];
+    var circle = two.makeCircle(0, 0, 4);
+    circle.fill = strokeStyle;
+    circle.stroke = strokeStyle;
+    if(cb.variableOpacity) {
+        circle.opacity = 1 / 1;
+    }
+    if(cb.variableOpacity) {
+        circle.opacity = 1 / 1;
+    }
+     foreground.add(circle);
 
-    const canv = document.getElementsByTagName('canvas')[0];
-    const ctx = canv.getContext("2d");
     //ctx.globalCompositeOperation = stateMachine.rules.globalCompositeOperation;
 
   var smRules = null;
@@ -833,6 +854,7 @@ const setupStateMachine= () => {
   stateMachine = new GenerativeStateMachine();
   if (smRules) { stateMachine.rules = smRules; }
   stateMachine.asyncCompute = smRules.asyncRender;
+
   stateMachine.onEmitElement = (machine, el) => { 
     //renderElement(el)
       //setTimeout(() => renderElement(el), 0)

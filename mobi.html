@@ -1,0 +1,393 @@
+
+<!DOCTYPE html>
+<html lang="en" >
+
+<head>
+
+  <meta charset="UTF-8">
+  
+<link rel="apple-touch-icon" type="image/png" href="https://static.codepen.io/assets/favicon/apple-touch-icon-5ae1a0698dcc2402e9712f7d01ed509a57814f994c660df9f7a952f3060705ee.png" />
+<meta name="apple-mobile-web-app-title" content="CodePen">
+
+<link rel="shortcut icon" type="image/x-icon" href="https://static.codepen.io/assets/favicon/favicon-aec34940fbc1a6e787974dcd360f2c6b63348d4b1f4e06c77743096d55480f33.ico" />
+
+<link rel="mask-icon" type="" href="https://static.codepen.io/assets/favicon/logo-pin-8f3771b1072e3c38bd662872f6b673a722f4b3ca2421637d5596661b4e2132cc.svg" color="#111" />
+
+
+<title>CodePen - A Pen by Sebastian Schepis</title>
+  
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+
+<style>
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background-color: #000;
+  overflow: hidden;
+}
+
+/* Scale canvas with resize attribute to full size */
+canvas[resize] {
+  width: 100%;
+  height: 100%;
+}
+
+canvas[buffer] {
+  width: 100%;
+  height: 100%;
+}
+</style>
+
+</head>
+
+<body translate="no" >
+<canvas id="scene" resize></canvas>
+<script type="text/paperscript" canvas="scene">
+
+  var colorRange = (255 * 255 * 255);
+  function hexColor(c) {
+    c = Math.floor(c);
+    var o =  c.toString(16);
+    while(o.length < 6) o = '0' + o;
+    return '#' + o;
+  }
+  
+  function Fractope(_s,_l,_i,_o) {
+      var self = this;
+      this.unitLength = _l;
+      this.rootNumber = _s;
+      this.iterations = _i;
+      this.container = document.getElementById('scene');
+      this.activeRegion = ZingTouch.Region(document.body);
+      this.angle = 0;
+      this.scale = 1;
+      this.rotangle = 0;
+      this.options = _o || {};
+      this.modeIndex = 0;
+      this.colorIndex = 0;
+      this.modes = ['rotateall', 'rotate', 'opacity', 'color', 'iterations', 'faces', 'shapes', 'zoom'];
+      this.shapes = ['polygons', 'lines', 'ballines'];
+      this.shapeIndex = 2;
+      this.fadeText = new PointText(view.center);
+      this.statusText = new PointText(new Point(140, 40));
+      this.debounce = {}
+      this.tick = 360 / 24;
+      this.fadeText.bounds.center.y = 80;
+      this.modeLabels = [];
+
+      function showTheText(lab, txt) {
+        lab.content = txt;
+        lab.opacity = 1
+        lab.style = {
+            fontFamily: 'Courier New',
+            fontWeight: 'bold',
+            fontSize: 20,
+            fillColor: 'red',
+            justification: 'center',
+        };   
+      }
+      this.showText = function(t) {
+        showTheText(self.fadeText, t)
+      }
+      this.showText(this.modes[this.modeIndex]);
+    
+      this.showMenuItems = function() {
+        var xoffset = 0, viewWidth = view.center.x * 2
+        var cnt = this.modes.length
+        this.modes.forEach(function(mi, ndx) {
+          var lab = new PointText(view.center);
+          lab.content = mi;
+          lab.opacity = 1
+          lab.style = {
+              fontFamily: 'Courier New',
+              fontWeight: 'bold',
+              fontSize: 20,
+              fillColor: 'red',
+              justification: 'center',
+          };
+          var offsetTick = viewWidth / (cnt*2); 
+          xoffset = (ndx != 0 ? (offsetTick*2*ndx) : 0) + offsetTick;
+          lab.bounds.center.y = (view.center.y*2) - 30;
+          lab.bounds.center.x = xoffset
+          xoffset += lab.bounds.width + 40
+          self.modeLabels.push(lab);
+        })
+      }
+      this.showMenuItems()
+    
+      this.showStatus = function() {
+        showTheText(self.statusText, self.rootNumber + ' faces, ' + self.iterations + ' iterations, ' + this.rotangle);
+        self.statusText.bounds.center = view.center;
+        self.statusText.bounds.center.y = 40;
+      }
+      this.showStatus();
+      
+      this.processEvents = function(evt, event) {
+        switch(evt) {
+          case 'rotate':
+            self.angle += event.detail.distanceFromLast;
+            self.group.rotate(event.detail.distanceFromLast);
+            self.showText(self.angle)
+            break;
+          case 'rotateall':
+            var waitTime = self.rootNumber > 5 ? 500 : 200;
+            self.rotangle += event.detail.distanceFromLast;
+            self.elements.forEach(function(el) {
+              el.rotate(event.detail.distanceFromLast);
+            })
+            self.showText(self.rotangle)
+            self.showStatus();         
+            break;
+          case 'opacity':
+            var opa = (event.detail.distanceFromLast / 360);
+            self.showText(opa)
+            self.group.opacity += (event.detail.distanceFromLast / 360)
+            break;
+          case 'iterations':
+            var dir = event.detail.distanceFromOrigin
+            var ticks = Math.round(dir) % Math.round(self.tick);
+            if(ticks === 0) {
+              self.group.remove()
+              if(dir > 0) { self.iterations = self.iterations + 1 } 
+              else { self.iterations = self.iterations - 1 }
+              if( self.iterations < 1) { self.iterations = 1; }
+              if( self.iterations > 5) { self.iterations = 5; }
+              if( self.iterations > 3 && self.rootNumber > 6 ) {
+                self.iterations = 2;
+              }
+              self.showText(self.iterations + 'iterations')
+              buildElements()
+            } 
+            break;
+          case 'faces':
+            var dir = event.detail.distanceFromOrigin
+            var ticks = Math.round(dir) % Math.round(self.tick);
+            if(ticks ===0 ) {
+              self.group.removeChildren()
+              if(dir > 0) { self.rootNumber = self.rootNumber + 1 } 
+              else {
+                if(self.rootNumber > 1) {
+                  self.rootNumber = self.rootNumber - 1
+                }
+              }
+              buildElements() 
+              self.showText(self.rootNumber + ' faces');
+            }   
+            break;
+          case 'color':
+            var dir = event.detail.distanceFromOrigin
+            var ticks = Math.round(dir) % Math.round(self.tick);
+            if(ticks === 0) {
+              if(dir > 0) {
+                if(self.colorIndex < self.rootNumber) {
+                  self.colorIndex = self.colorIndex + 1;
+                } else { self.colorIndex = 0; }
+              } else {
+                if(self.colorIndex > 0) {
+                  self.colorIndex = self.colorIndex - 1;
+                } else { self.colorIndex = self.rootNumber - 1; }
+              }
+              self.elements.forEach(function(el) {
+                if(el.polytopia) {
+                  el.fillColor = getPolyColor(el.polytopia.iteration, el.polytopia.index)
+                  el.strokeColor = getPolyColor(el.polytopia.iteration, el.polytopia.index)
+                }
+              })
+              self.showText('mode ' + self.colorIndex);
+              self.showStatus(self.colorIndex); 
+            } 
+            break;
+          case 'shapes':
+            var dir = event.detail.distanceFromOrigin
+            var ticks = Math.round(dir) % Math.round(self.tick);
+            if(ticks === 0) {
+              self.group.removeChildren()
+              if(dir > 0) { self.shapeIndex = self.shapeIndex + 1 } 
+              else { self.shapeIndex = self.shapeIndex - 1 }
+              if(self.shapeIndex >= self.shapes.length) {
+                self.shapeIndex = 0;
+              }
+              if(self.shapeIndex < 0) {
+                self.shapeIndex = self.shapes.length - 1;
+              }
+              buildElements();
+              self.showText(self.shapes[self.shapeIndex]);
+            }  
+            break;
+          case 'zoom':
+            var dir = event.detail.distanceFromOrigin
+            var ticks = Math.round(dir) % Math.round(self.tick);
+            if(ticks === 0) {
+              var s = (dir > 0 ? 0.001 : -0.001);
+              self.scale += s
+              if(self.scale < 0.1) {
+                self.scale = 0.1;
+              }
+              if(self.scale > 2) {
+                self.scale = 2;
+              }
+              self.group.scale(self.scale)
+              self.showText('scale ' + self.scale);
+            }      
+            break;
+        }
+      }
+    
+      this.activeRegion.bind(this.container, 'tap', function(event) {
+        var processed = false;
+        var pt = new Point(event.detail.events[0].x, event.detail.events[0].y);
+        self.modeLabels.forEach(function(mi, ndx) {
+          if(mi.bounds.contains(pt)) {
+            self.modeIndex = ndx;
+            self.showText(self.modes[ndx]);
+            processed = true;
+          }
+        });
+        if(processed) return true;
+        self.modeIndex = self.modeIndex + 1;
+        if(!(self.modeIndex<self.modes.length)) {
+          self.modeIndex = 0;
+        }
+        self.showText(self.modes[self.modeIndex]);
+      }, false);
+    
+      this.activeRegion.bind(this.container, 'pan', function(event) {
+      }, false);
+    
+      this.activeRegion.bind(this.container, 'rotate', function(event) {
+        var mode = self.modes[self.modeIndex];
+        self.processEvents(mode, event);
+      });    
+      
+      function getPolyColor(iter, index) {
+        var cc;
+        if(self.colorIndex === 0) {
+          cc = '#fff'
+        } else {
+          var tndx = self.colorIndex - 1 + index
+          if(tndx%3===0) {
+            cc = '#ff0000';
+          }
+          if(tndx%3===1) {
+            cc = '#00ff00';
+          }
+          if(tndx%3===2) {
+            cc = '#0000ff';
+          }            
+        }
+        return cc;
+      }
+    
+      function iterate(iter, ndx, pos) {
+          var ret = [], it = iter === 0 ? 1 : iter
+          var opa = 1 / ( it * it * self.options.opacity)
+          var cc = getPolyColor(iter, ndx);
+          var shape = self.shapes[self.shapeIndex];
+          var polytope = new Path.RegularPolygon({
+            center: pos,
+            sides: self.rootNumber,
+            radius: self.unitLength / (iter === 0 ? 1 : iter),
+            strokeColor: cc,
+            fillColor: cc,
+            opacity: opa
+          });
+          var polypath = polytope.clone()
+          if(shape === 'polygons' || shape === 'lines' || shape === 'ballines') {
+            if(shape === 'lines' || shape === 'ballines') {
+              var arr = [];
+              for(var i=0;i  < self.rootNumber;i++) {
+                var pt = polytope.segments[i].point;
+                var path = new Path.Line({
+                  from: pt,
+                  to: pos,
+                  center: pos,
+                  strokeColor: cc,
+                  fillColor: cc,
+                  strokeWidth: ( self.rootNumber * 2  ) / self.iterations
+                });
+                arr.push(path);
+              }
+              if(shape === 'ballines') {
+                arr.push(new Path.Circle({
+                  center: pos,
+                  radius: self.unitLength / ( (iter === 0 ? 1 : iter) * 2 ),
+                  strokeColor: cc,
+                  fillColor: cc,
+                  opacity: opa
+                }));
+              }
+              polytope.remove();
+              polytope = new Group({
+                center: pos,
+                children: arr,
+                strokeColor: cc,
+                fillColor: cc,
+                opacity: opa
+              });
+            }
+          }
+          
+          polytope.polytopia = {
+            iteration: iter,
+            index: ndx
+          }
+          polytope.rotate(self.options.rotate)
+          polypath.rotate(self.options.rotate)
+          ret.push(polytope); 
+          for(var i=0;i<self.rootNumber;i++) {
+            var pt = polypath.segments[i].point;
+            if(iter + 1 < self.iterations) {
+              var els = iterate(iter + 1, i, pt);
+              ret = ret.concat(els);
+            }
+          }
+          polypath.remove();
+          return ret;
+      }
+      function buildElements() {
+        self.elements = iterate(1, 0);
+        self.group = new Group(self.elements);
+        self.group.position.x = view.center.x;
+        self.group.position.y = view.center.y;
+        self.group.opacity = self.options.opacity        
+      }
+      buildElements() 
+
+
+      this.onFrame = function(event) {
+        if(self.fadeText) {
+          if(self.fadeText.opacity > 0) {
+            self.fadeText.opacity = self.fadeText.opacity - 0.05;
+          }
+        }
+        if(self.statusText) {
+          if(self.statusText.opacity > 0) {
+            self.statusText.opacity = self.statusText.opacity - 0.01;
+          }
+        }
+      }
+  }
+  
+
+  var ft;
+  if(!ft)ft = new Fractope(5, 128, 2, {
+    rotate: 0,
+    opacity: 0.7,
+    scale: 1.5
+  });
+
+
+function onFrame(event) {
+  if(ft) ft.onFrame(event);
+}
+
+</script>
+  
+<script src='https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.12.11/paper-full.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/zingtouch/1.0.6/zingtouch.min.js'></script>  
+
+</body>
+
+</html>
+ 
