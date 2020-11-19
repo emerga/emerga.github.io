@@ -123,7 +123,7 @@ https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js
       this.showMenuItems()
     
       this.showStatus = function() {
-        showTheText(self.statusText, self.rootNumber + ' faces, ' + self.iterations + ' iterations, ' + this.rotangle);
+        showTheText(self.statusText, self.rootNumber + ' faces, ' + self.iterations + ' iterations, ' + Math.round(this.rotangle) + '°');
         self.statusText.bounds.center = view.center;
         self.statusText.bounds.center.y = 40;
       }
@@ -135,6 +135,7 @@ https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js
             self.angle += event.velocityY;
             self.group.rotate(event.velocityY);
             self.showText('rotate ' + Math.round(self.angle))
+            self.showStatus(); 
             break;
           case 'rotateall':
             self.rotangle -= event.velocityY;
@@ -147,11 +148,13 @@ https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js
             self.elements.forEach(function(el) {
               el.rotate(event.velocityY);
             })
-            self.showText('rotate all ' + Math.round(self.rotangle))        
+            self.showText('rotate all ' + Math.round(self.rotangle));
+            self.showStatus(); 
             break;
           case 'opacity':
             self.group.opacity += event.velocity;
             self.showText(self.group.opacity);
+            self.showStatus(); 
             break;
           case 'iterations':
             var dir = event.deltaX
@@ -165,8 +168,8 @@ https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js
               if( self.iterations > 3 && self.rootNumber > 6 ) {
                 self.iterations = 2;
               }
-              self.showText(self.iterations + ' iterations')
-              buildElements()
+              self.showText(self.iterations + ' iterations');
+              buildElements();
             } 
             break;
           case 'faces':
@@ -182,12 +185,13 @@ https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js
               }
               buildElements() 
               self.showText(self.rootNumber + ' faces');
+              self.showStatus(); 
             }   
             break;
           case 'color':
-            var dir = event.distance;
-            var ticks = Math.round(dir) % Math.round(self.tick);
-            if(ticks === 0) {
+            var dist = event.distance ? event.distance : 0;
+            var ticks = Math.round(dist) % Math.round(self.tick);
+            if(ticks === 0||event.override===true) {
               if(self.colorIndex < self.rootNumber) {
                 self.colorIndex = self.colorIndex + 1;
               } else { self.colorIndex = 0; }
@@ -197,8 +201,7 @@ https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js
                   el.strokeColor = getPolyColor(el.polytopia.iteration, el.polytopia.index)
                 }
               })
-              self.showText('mode ' + self.colorIndex);
-              self.showStatus(self.colorIndex); 
+              self.showStatus(); 
             } 
             break;
           case 'shapes':
@@ -211,6 +214,7 @@ https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js
             }
             buildElements();
             self.showText(self.shapes[self.shapeIndex]);
+            self.showStatus(); 
             break;
           case 'zoom':
             var dir = event.velocity
@@ -223,9 +227,9 @@ https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js
             }
             self.group.scale(self.scale)
             self.showText('zoom ' + self.scale);     
+            self.showStatus(); 
             break;
         }
-        self.showStatus(); 
       }
     
       this.hammer.on('panup pandown panleft panright', function(ev) {
@@ -233,15 +237,15 @@ https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js
       });
 
       this.hammer.on("pinch", function(ev) {
-        this.onPinch(event);
+        this.onPinch(ev);
       });
 
       this.hammer.on("rotate", function(ev) {
-        this.onRotate(event);
+        this.onRotate(ev);
       });
 
       this.hammer.on("press", function(ev) {
-        self.onPress();
+        self.onPress(ev);
       });
 
       this.onPinch = function(event) {
@@ -252,8 +256,13 @@ https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js
         self.processEvents('color', event);
       };
 
-      this.onPress = function() {
-        self.processEvents('shapes');
+      this.onPress = function(event) {
+        if(event.center.x < view.center._x) {
+          event.override = true;
+          self.processEvents('color', event);
+        } else {
+          self.processEvents('shapes', event);
+        }
       };
 
       this.onPan = function(event) {
@@ -393,7 +402,9 @@ https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js
         if(self.panning && self.panning > 0) {
           self.panning--;
         } else rotationChange = 0.1;
-
+        if(rotationChange!==0) {
+          self.group.rotate(rotationChange);
+        }
         self.elements.forEach(function(el) {
           if(el.polytopia.iteration === 1) {
             self.rotangle += rotationChange * (el.polytopia.iteration);
@@ -416,8 +427,8 @@ https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js
             var opa = (1 / ( el.polytopia.iteration * (el.polytopia.iteration / 2) * self.options.opacity ) ) * relPos
             el.opacity = (opa);
           }
-          skip++;
         })
+        skip++;
       }
   }
   
