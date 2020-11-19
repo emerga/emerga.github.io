@@ -68,7 +68,7 @@ canvas[buffer] {
       this.colorIndex = 0;
       this.modes = ['rotateall', 'rotate', 'opacity', 'color', 'iterations', 'faces', 'shapes', 'zoom'];
       this.shapes = ['polygons', 'lines', 'ballines'];
-      this.shapeIndex = 1;
+      this.shapeIndex = 0;
       this.fadeText = new PointText(view.center);
       this.statusText = new PointText(new Point(140, 40));
       this.debounce = {}
@@ -133,6 +133,12 @@ canvas[buffer] {
           case 'rotateall':
             var waitTime = self.rootNumber > 5 ? 500 : 200;
             self.rotangle += event.detail.distanceFromLast;
+            if(self.rotangle>360) {
+              self.rotangle = self.rotangle - 360;
+            }
+            if(self.rotangle<0) {
+              self.rotangle = 360 - self.rotangle;
+            }
             self.elements.forEach(function(el) {
               el.rotate(event.detail.distanceFromLast);
             })
@@ -238,7 +244,9 @@ canvas[buffer] {
         var processed = false;
         var pt = new Point(event.detail.events[0].x, event.detail.events[0].y);
         self.modeLabels.forEach(function(mi, ndx) {
+          mi.fillColor = 'red';
           if(mi.bounds.contains(pt)) {
+            mi.fillColor = 'white';
             self.modeIndex = ndx;
             self.showText(self.modes[ndx]);
             processed = true;
@@ -314,7 +322,7 @@ canvas[buffer] {
                   radius: self.unitLength / ( (iter === 0 ? 1 : iter) * 2 ),
                   strokeColor: cc,
                   fillColor: cc,
-                  opacity: opa
+                  opacity: opa / 2
                 }));
               }
               polytope.remove();
@@ -332,9 +340,11 @@ canvas[buffer] {
             iteration: iter,
             index: ndx
           }
-          polytope.rotate(self.options.rotate)
-          polypath.rotate(self.options.rotate)
+          polytope.rotate(self.options.rotate);
+          polypath.rotate(self.options.rotate);
+
           ret.push(polytope); 
+
           for(var i=0;i<self.rootNumber;i++) {
             var pt = polypath.segments[i].point;
             if(iter + 1 < self.iterations) {
@@ -368,16 +378,30 @@ canvas[buffer] {
           }
         }
         self.elements.forEach(function(el) {
-          el.rotate(0.3 * (el.polytopia.iteration));
+          if(el.polytopia.iteration === 1) {
+            self.rotangle += 0.3 * (el.polytopia.iteration);
+            if(self.rotangle>360) {
+              self.rotangle = self.rotangle - 360;
+            }
+            if(self.rotangle<0) {
+              self.rotangle = 360 - self.rotangle;
+            }
+          }
+          el.rotate(1 * (el.polytopia.iteration));
+          var relPos = ((180 - self.rotangle*el.polytopia.iteration) / 180);
+          relPos = Math.abs(relPos);
+          var opa = (1 / ( el.polytopia.iteration * (el.polytopia.iteration / 2) * self.options.opacity ) ) * relPos
+
+          el.opacity = (opa);
         })
       }
   }
   
 
   var ft;
-  if(!ft)ft = new Fractope(3, 128, 4, {
+  if(!ft)ft = new Fractope(9, 128, 4, {
     rotate: 0,
-    opacity: 1,
+    opacity: 0.6,
     scale: 1.8
   });
 
