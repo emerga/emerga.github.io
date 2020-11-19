@@ -76,7 +76,8 @@ https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js
       this.hammer.add([
         this.pinch, 
         this.rotate, 
-        this.pan
+        this.pan,
+        new Hammer.Press()
       ]);
 
       function showTheText(lab, txt) {
@@ -201,21 +202,15 @@ https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js
             } 
             break;
           case 'shapes':
-            var dir = event.deltaX
-            var ticks = Math.round(dir) % Math.round(self.tick);
-            if(ticks === 0) {
-              self.group.removeChildren()
-              if(dir > 0) { self.shapeIndex = self.shapeIndex + 1 } 
-              else { self.shapeIndex = self.shapeIndex - 1 }
-              if(self.shapeIndex >= self.shapes.length) {
-                self.shapeIndex = 0;
-              }
-              if(self.shapeIndex < 0) {
-                self.shapeIndex = self.shapes.length - 1;
-              }
-              buildElements();
-              self.showText(self.shapes[self.shapeIndex]);
-            }  
+            self.shapeIndex = self.shapeIndex + 1
+            if(self.shapeIndex >= self.shapes.length) {
+              self.shapeIndex = 0;
+            }
+            if(self.shapeIndex < 0) {
+              self.shapeIndex = self.shapes.length - 1;
+            }
+            buildElements();
+            self.showText(self.shapes[self.shapeIndex]);
             break;
           case 'zoom':
             var dir = event.velocity
@@ -237,16 +232,16 @@ https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js
         self.onPan(ev);
       });
 
-      this.hammer.on("pinch rotate", function(ev) {
-        console.log(JSON.stringify(ev));
+      this.hammer.on("pinch", function(ev) {
+        this.onPinch(event);
       });
 
-      this.hammer.on("tap", function(ev) {
-        self.onTap(ev.center);
+      this.hammer.on("rotate", function(ev) {
+        this.onRotate(event);
       });
 
       this.hammer.on("press", function(ev) {
-        this.onTap(ev.center);
+        self.onPress();
       });
 
       this.onPinch = function(event) {
@@ -255,6 +250,10 @@ https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js
 
       this.onRotate = function(event) {
         self.processEvents('color', event);
+      };
+
+      this.onPress = function() {
+        self.processEvents('shapes');
       };
 
       this.onPan = function(event) {
@@ -267,7 +266,6 @@ https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js
             mode = 'rotate';
           }
         }
-        console.log(mode, event.type, event.center, view.center)
         if(event.type === 'panleft' || event.type === 'panright') {
           if(event.center.y  < view.center._y) {
             mode = 'faces';
@@ -278,26 +276,6 @@ https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js
         self.processEvents(mode, event);
       };
 
-      this.onTap = function(pos) {
-        var processed = false;
-        var pt = new Point(pos.x, pos.y);
-        self.modeLabels.forEach(function(mi, ndx) {
-          mi.fillColor = 'red';
-          if(mi.bounds.contains(pt)) {
-            mi.fillColor = 'white';
-            self.modeIndex = ndx;
-            self.showText(self.modes[ndx]);
-            processed = true;
-          }
-        });
-        if(processed) return true;
-        self.modeIndex = self.modeIndex + 1;
-        if(!(self.modeIndex<self.modes.length)) {
-          self.modeIndex = 0;
-        }
-        self.showText(self.modes[self.modeIndex]);
-      }   
-      
       function getPolyColor(iter, index) {
         var cc;
         if(self.colorIndex === 0) {
@@ -386,6 +364,9 @@ https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js
           return ret;
       }
       function buildElements() {
+        if(self.group) {
+          self.group.remove();
+        }
         self.elements = iterate(1, 0, 0, []);
         self.group = new Group(self.elements);
         self.group.position.x = view.center.x;
