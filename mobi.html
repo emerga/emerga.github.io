@@ -54,9 +54,9 @@ https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js
       this.rotangle = 0;
       this.options = _o || {};
       this.modeIndex = 0;
-      this.colorIndex = 1;
+      this.colorIndex = 3;
       this.modes = ['rotateall', 'rotate', 'opacity', 'color', 'iterations', 'faces', 'shapes', 'zoom'];
-      this.shapes = ['polygons', 'circles', 'lines', 'ballines'];
+      this.shapes = ['polygons', 'bigcircles', 'circles', 'lines', 'ballines'];
       this.shapeIndex = 1;
       this.fadeText = new PointText(view.center);
       this.statusText = new PointText(new Point(140, 40));
@@ -65,6 +65,8 @@ https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js
       this.fadeText.bounds.center.y = 80;
       this.modeLabels = [];
       this.panning = 0;
+      this.blendModes = ['normal', 'multiply', 'screen', 'overlay', 'soft-light', 'hard-light', 'color-dodge', 'color-burn', 'darken', 'lighten', 'difference', 'exclusion', 'hue', 'saturation', 'luminosity', 'color', 'add', 'subtract', 'average', 'pin-light', 'negation', 'source-over', 'source-in', 'source-out', 'source-atop', 'destination-over', 'destination-in', 'destination-out', 'destination-atop', 'lighter', 'darker', 'copy', 'xor'];
+      this.blendModeIndex = 0;
 
       this.container = document.getElementById('scene');
       this.hammer = new Hammer.Manager(this.container);
@@ -77,7 +79,8 @@ https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js
         this.pinch, 
         this.rotate, 
         this.pan,
-        new Hammer.Press()
+        new Hammer.Press(),
+        new Hammer.Tap()
       ]);
 
       function showTheText(lab, txt) {
@@ -159,18 +162,14 @@ https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js
           case 'iterations':
             var dir = event.deltaX
             var ticks = dir % self.tick;
-            if(ticks === 0) {
-              self.group.remove()
-              if(dir >= 0) { self.iterations = self.iterations + 1 } 
-              else { self.iterations = self.iterations - 1 }
-              if( self.iterations < 1) { self.iterations = 1; }
-              if( self.iterations > 8) { self.iterations = 8; }
-              if( self.iterations > 3 && self.rootNumber > 6 ) {
-                self.iterations = 2;
-              }
-              self.showText(self.iterations + ' iterations');
-              buildElements();
-            } 
+            self.group.remove()
+            if(dir >= 0) { self.iterations = self.iterations + 1 } 
+            else { self.iterations = self.iterations - 1 }
+            if( self.iterations < 1) { self.iterations = 1; }
+            if( self.iterations > 8) { self.iterations = 8; }
+
+            self.showText(self.iterations + ' iterations');
+            buildElements();
             break;
           case 'faces':
             var dir = event.deltaX
@@ -234,6 +233,14 @@ https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js
     
       this.hammer.on('panup pandown panleft panright', function(ev) {
         self.onPan(ev);
+      });
+
+      this.hammer.on("tap", function(ev) {
+        if(self.blendModeIndex < self.blendModes.length) {
+          self.blendModeIndex += 1;
+        } else self.blendModeIndex = 0;
+        self.showText(self.blendModes[self.blendModeIndex]);
+        self.elements.forEach(function(el) {el.blendMode = self.blendModes[self.blendModeIndex]});
       });
 
       this.hammer.on("pinch", function(ev) {
@@ -315,10 +322,11 @@ https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js
             radius: self.unitLength / (iter === 0 ? 1 : iter),
             strokeColor: cc,
             fillColor: cc,
+            blendMode: self.blendModes[self.blendModeIndex]
           });
           var polypath = polytope.clone()
-          if(shape === 'polygons' || shape === 'lines' || shape === 'ballines'|| shape === 'circles') {
-            if(shape === 'lines' || shape === 'ballines' || shape === 'circles') {
+          if(shape === 'polygons' || shape === 'lines' || shape === 'ballines'|| shape === 'circles'|| shape === 'bigcircles') {
+            if(shape === 'lines' || shape === 'ballines' || shape === 'circles'|| shape === 'bigcircles') {
               var arr = [];
               if(shape !== 'circles') {
                 for(var i=0;i  < self.rootNumber;i++) {
@@ -329,17 +337,18 @@ https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js
                     center: pos,
                     strokeColor: cc,
                     fillColor: cc,
+                    blendMode: self.blendModes[self.blendModeIndex],
                     strokeWidth: 2 // ( self.rootNumber * 2  ) / self.iterations
                   });
                   arr.push(path);
                 }
               }
-              if(shape === 'ballines' || shape === 'circles') {
+              if(shape === 'ballines' || shape === 'circles'|| shape === 'bigcircles') {
                 arr.push(new Path.Circle({
                   center: pos,
-                  radius: self.unitLength / ( (iter === 0 ? 1 : iter) * (shape === 'circles'?1:2) ),
+                  radius: self.unitLength / ( (iter === 0 ? 1 : iter) * (shape === 'bigcircles'?1:2) ),
                   strokeColor: cc,
-                  fillColor: cc,
+                  fillColor: cc
                 }));
               }
               polytope.remove();
@@ -348,7 +357,8 @@ https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js
                 children: arr,
                 strokeColor: cc,
                 fillColor: cc,
-                opacity: opa
+                opacity: opa,
+                blendMode: self.blendModes[self.blendModeIndex]
               });
             }
           }
@@ -364,7 +374,7 @@ https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js
           ret.push(polytope); 
           for(var i=0;i<self.rootNumber;i++) {
             var pt = polypath.segments[i].point;
-            if(iter + 1 < self.iterations) {
+            if(iter + 1 <= self.iterations) {
               var els = iterate(iter + 1, i, pt, []);
               ret = ret.concat(els)
             }
@@ -401,7 +411,7 @@ https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js
         var rotationChange = 0;
         if(self.panning && self.panning > 0) {
           self.panning--;
-        } else rotationChange = 0.1;
+        } else rotationChange = 0.25;
         if(rotationChange!==0) {
           self.group.rotate(rotationChange);
         }
@@ -425,6 +435,8 @@ https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js
             var relPos = ((180 - ((self.rootNumber*self.rotangle*el.polytopia.iteration)%360)) / 180);
             relPos = Math.abs(relPos);
             var opa = (1 / ( el.polytopia.iteration * (el.polytopia.iteration / 2) * self.options.opacity ) ) * relPos
+            if(opa > 0.98) opa = 0.98;
+            if(opa < 0.02) opa = 0.02;
             el.opacity = (opa);
           }
         })
@@ -434,9 +446,9 @@ https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js
   
 
   var ft;
-  if(!ft)ft = new Fractope(9, 128, 3, {
+  if(!ft)ft = new Fractope(9, 128, 4, {
     rotate: 0,
-    opacity: 1,
+    opacity: 0.8,
     scale: 1.8
   });
 
