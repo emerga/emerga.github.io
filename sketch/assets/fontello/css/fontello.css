@@ -1,0 +1,105 @@
+@font-face {
+  font-family: 'fontello';
+  src: url('../font/fontello.eot?49862123');
+  src: url('../font/fontello.eot?49862123#iefix') format('embedded-opentype'),
+       url('../font/fontello.woff?49862123') format('woff'),
+       url('../font/fontello.ttf?49862123') format('truetype'),
+       url('../font/fontello.svg?49862123#fontello') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+/* Chrome hack: SVG is rendered more smooth in Windozze. 100% magic, uncomment if you need it. */
+/* Note, that will break hinting! In other OS-es font will be not as sharp as it could be */
+/*
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  @font-face {
+    font-family: 'fontello';
+    src: url('../font/fontello.svg?49862123#fontello') format('svg');
+  }
+}
+*/
+ 
+ [class^="icon-"]:before, [class*=" icon-"]:before {
+  font-family: "fontello";
+  font-style: normal;
+  font-weight: normal;
+  speak: none;
+ 
+  display: inline-block;
+  text-decoration: inherit;
+  width: 1em;
+  margin-right: .2em;
+  text-align: center;
+  /* opacity: .8; */
+ 
+  /* For safety - reset parent styles, that can break glyph codes*/
+  font-variant: normal;
+  text-transform: none;
+     
+  /* fix buttons height, for twitter bootstrap */
+  line-height: 1em;
+ 
+  /* Animation center compensation - margins should be symmetric */
+  /* remove if not needed */
+  margin-left: .2em;
+ 
+  /* you can be more comfortable with increased icons size */
+  /* font-size: 120%; */
+ 
+  /* Uncomment for 3D effect */
+  /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
+}
+ 
+.icon-grid:before { content: '\e800'; } /* 'î €' */
+.icon-arrow-black:before { content: '\e801'; } /* 'î ' */
+.icon-play:before { content: '\e802'; } /* 'î ‚' */
+.icon-ok:before { content: '\e803'; } /* 'î ƒ' */
+.icon-cancel:before { content: '\e804'; } /* 'î „' */
+.icon-cancel-circle:before { content: '\e805'; } /* 'î …' */
+.icon-arrow-white:before { content: '\e806'; } /* 'î †' */
+.icon-to-start:before { content: '\e807'; } /* 'î ‡' */
+.icon-stop:before { content: '\e808'; } /* 'î ˆ' */
+.icon-edit:before { content: '\e809'; } /* 'î ‰' */
+.icon-down-dir:before { content: '\e80a'; } /* 'î Š' */
+.icon-left-dir:before { content: '\e80b'; } /* 'î ‹' */
+.icon-right-dir:before { content: '\e80c'; } /* 'î Œ' */
+.icon-up-dir:before { content: '\e80d'; } /* 'î ' */
+.icon-down:before { content: '\e80e'; } /* 'î Ž' */
+.icon-up:before { content: '\e80f'; } /* 'î ' */
+.icon-heart:before { content: '\e810'; } /* 'î ' */
+.icon-star:before { content: '\e811'; } /* 'î ‘' */
+.icon-attention:before { content: '\e812'; } /* 'î ’' */
+.icon-info:before { content: '\e813'; } /* 'î “' */
+.icon-question:before { content: '\e814'; } /* 'î ”' */
+.icon-trash:before { content: '\e815'; } /* 'î •' */
+.icon-to-end:before { content: '\e817'; } /* 'î —' */
+.icon-plus:before { content: '\e818'; } /* 'î ˜' */
+.icon-th-list:before { content: '\e819'; } /* 'î ™' */
+.icon-wrench:before { content: '\e81a'; } /* 'î š' */
+.icon-fountain-pen:before { content: '\e81b'; } /* 'î ›' */
+.icon-resize-full:before { content: '\e81c'; } /* 'î œ' */
+.icon-popup:before { content: '\e81d'; } /* 'î ' */
+.icon-refresh:before { content: '\e81e'; } /* 'î ž' */
+.icon-fast-forward:before { content: '\e81f'; } /* 'î Ÿ' */
+.icon-fast-backward:before { content: '\e820'; } /* 'î  ' */
+.icon-pencil:before { content: '\e821'; } /* 'î ¡' */
+.icon-pause:before { content: '\e822'; } /* 'î ¢' */
+.icon-attach:before { content: '\e823'; } /* 'î £' */
+.icon-eye:before { content: '\e824'; } /* 'î ¤' */
+.icon-eye-off:before { content: '\e825'; } /* 'î ¥' */
+.icon-file-text:before { content: '\e826'; } /* 'î ¦' */
+.icon-zoom:before { content: '\e827'; } /* 'î §' */
+.icon-ruler:before { content: '\e828'; } /* 'î ¨' */
+.icon-resize-small:before { content: '\e829'; } /* 'î ©' */
+.icon-record:before { content: '\e82a'; } /* 'î ª' */
+.icon-lock:before { content: '\e82b'; } /* 'î «' */
+.icon-lock-open:before { content: '\e82c'; } /* 'î ¬' */
+.icon-cog:before { content: '\e82d'; } /* 'î ­' */
+.icon-grab:before { content: '\e82e'; } /* 'î ®' */
+.icon-folder:before { content: '\e82f'; } /* 'î ¯' */
+.icon-folder-open:before { content: '\e830'; } /* 'î °' */
+.icon-file-pdf:before { content: '\e831'; } /* 'î ±' */
+.icon-file-markup:before { content: '\e832'; } /* 'î ²' */
+.icon-file-archive:before { content: '\e833'; } /* 'î ³' */
+.icon-file-image:before { content: '\e834'; } /* 'î ´' */
+.icon-file:before { content: '\e835'; } /* 'î µ' */
